@@ -1,0 +1,11 @@
+# Usage:
+#   pip install -r requirements.txt
+# Ref:
+# https://pip.pypa.io/en/latest/user_guide.html#requirements-files
+# jgk - Added pymssql
+# If running on a Mac and using MSSQL, you will also need to install freetds: brew install freetds if you have Homebrew installed
+xlrd
+xlwt
+xlutils
+sqlparse
+pymssql

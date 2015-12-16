@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns6:request xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/" xmlns:ns7="http://www.i2b2.org/xsd/cell/ont/1.1/" xmlns:ns3="http://www.i2b2.org/xsd/cell/crc/pdo/1.1/" xmlns:ns5="http://www.i2b2.org/xsd/hive/plugin/" xmlns:ns2="http://www.i2b2.org/xsd/hive/pdo/1.1/" xmlns:ns6="http://www.i2b2.org/xsd/hive/msg/1.1/" xmlns:ns8="http://www.i2b2.org/xsd/cell/crc/psm/querydefinition/1.1/">
+	<message_header>
+	</message_header>
+	<request_header>
+		<result_waittime_ms>180000</result_waittime_ms>
+	</request_header>
+	<message_body>
+		<ns4:psmheader>
+
+			<query_mode>optimize_without_temp_table</query_mode>
+			<request_type>CRC_QRY_runQueryInstance_fromQueryDefinition</request_type>
+		</ns4:psmheader>
+		<ns4:request xsi:type="ns4:query_definition_requestType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<query_definition>
+	<query_name>Diabetes with o@15:48:17</query_name>
+	<query_timing>ANY</query_timing>
+	<specificity_scale>0</specificity_scale>
+	<panel>
+		<panel_number>1</panel_number>
+		<panel_accuracy_scale>100</panel_accuracy_scale>
+		<invert>0</invert>
+		<panel_timing>ANY</panel_timing>
+		<total_item_occurrences>1</total_item_occurrences>
+		<item>
+			<hlevel>8</hlevel>
+			<item_name>Diabetes with other specified manifestations, type ii or unspecified type, not stated as uncontrolled</item_name>
+			<item_key>\\PCORI_DIAG\PCORI\DIAGNOSIS\09\(001-999.99) D~qlur\(240-279.99) E~ro7n\(249-259.99) D~eqap\(250) Diabetes~kvrx\(250.8) Diabet~jag3\(250.80) Diabe~vau3\</item_key>
+			<tooltip>ICD9CM \ Diseases and injuries \ Endocrine, nutritional and metabolic diseases, and immunity disorders \ Diseases of other endocrine glands  \ Diabetes mellitus \ Diabetes with other specified manifestations \ Diabetes with other specified manifestations, type ii or unspecified type, not stated as uncontrolled</tooltip>
+			<class>ENC</class>
+			<item_icon>FA</item_icon>
+			<item_is_synonym>false</item_is_synonym>
+		</item>
+	</panel>
+</query_definition>
+
+			<result_output_list><result_output priority_index="10" name="patient_count_xml"/>
+</result_output_list>
+
+		</ns4:request>
+		
+	</message_body>
+</ns6:request>

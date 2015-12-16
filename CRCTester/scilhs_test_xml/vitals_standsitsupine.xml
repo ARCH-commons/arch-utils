@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns6:request xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/" xmlns:ns7="http://www.i2b2.org/xsd/cell/ont/1.1/" xmlns:ns3="http://www.i2b2.org/xsd/cell/crc/pdo/1.1/" xmlns:ns5="http://www.i2b2.org/xsd/hive/plugin/" xmlns:ns2="http://www.i2b2.org/xsd/hive/pdo/1.1/" xmlns:ns6="http://www.i2b2.org/xsd/hive/msg/1.1/" xmlns:ns8="http://www.i2b2.org/xsd/cell/crc/psm/querydefinition/1.1/">
+	<message_header>
+	</message_header>
+	<request_header>
+		<result_waittime_ms>180000</result_waittime_ms>
+	</request_header>
+	<message_body>
+		<ns4:psmheader>
+
+			<query_mode>optimize_without_temp_table</query_mode>
+			<request_type>CRC_QRY_runQueryInstance_fromQueryDefinition</request_type>
+		</ns4:psmheader>
+		<ns4:request xsi:type="ns4:query_definition_requestType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<query_definition>
+	<query_name>Standing@13:34:07</query_name>
+	<query_timing>ANY</query_timing>
+	<specificity_scale>0</specificity_scale>
+	<panel>
+		<panel_number>1</panel_number>
+		<panel_accuracy_scale>100</panel_accuracy_scale>
+		<invert>0</invert>
+		<panel_timing>ANY</panel_timing>
+		<total_item_occurrences>1</total_item_occurrences>
+		<item>
+			<hlevel>2</hlevel>
+			<item_key>\\PCORI_VITAL\PCORI\VITAL\BP\</item_key>
+			<item_name>Blood Pressure</item_name>
+			<tooltip>Blood pressure (in mmHg). Only populated if measure was taken on this date. If missing, leave blank.</tooltip>
+			<item_icon>FAE</item_icon>
+			<class>ENC</class>
+				<constrain_by_modifier>
+					<modifier_name>Standing</modifier_name>
+					<applied_path>\PCORI\VITAL\BP\%</applied_path>
+					<modifier_key>\\PCORI_VITAL\PCORI_MOD\BP_POSITION\02\</modifier_key>
+				</constrain_by_modifier>
+			<item_is_synonym>false</item_is_synonym>
+		</item>
+		<item>
+			<hlevel>2</hlevel>
+			<item_key>\\PCORI_VITAL\PCORI\VITAL\BP\</item_key>
+			<item_name>Blood Pressure</item_name>
+			<tooltip>Blood pressure (in mmHg). Only populated if measure was taken on this date. If missing, leave blank.</tooltip>
+			<item_icon>FAE</item_icon>
+			<class>ENC</class>
+				<constrain_by_modifier>
+					<modifier_name>Sitting</modifier_name>
+					<applied_path>\PCORI\VITAL\BP\%</applied_path>
+					<modifier_key>\\PCORI_VITAL\PCORI_MOD\BP_POSITION\01\</modifier_key>
+				</constrain_by_modifier>
+			<item_is_synonym>false</item_is_synonym>
+		</item>
+		<item>
+			<hlevel>2</hlevel>
+			<item_key>\\PCORI_VITAL\PCORI\VITAL\BP\</item_key>
+			<item_name>Blood Pressure</item_name>
+			<tooltip>Blood pressure (in mmHg). Only populated if measure was taken on this date. If missing, leave blank.</tooltip>
+			<item_icon>FAE</item_icon>
+			<class>ENC</class>
+				<constrain_by_modifier>
+					<modifier_name>Supine</modifier_name>
+					<applied_path>\PCORI\VITAL\BP\%</applied_path>
+					<modifier_key>\\PCORI_VITAL\PCORI_MOD\BP_POSITION\03\</modifier_key>
+				</constrain_by_modifier>
+			<item_is_synonym>false</item_is_synonym>
+		</item>
+	</panel>
+</query_definition>
+			<result_output_list><result_output priority_index="10" name="patient_count_xml"/>
+</result_output_list>
+
+		</ns4:request>
+		
+	</message_body>
+</ns6:request>

@@ -1,0 +1,14 @@
+Derived from the PCORI Annotated Data Dictionary Helper by Dan Connolly and Nathan Graham at Univeristy of Kansas Medical Center.
+
+Adapted for SCILHS and SQL Server by Jeff Klann, PhD.
+
+Instructions:
+1) Install python and pypi on your machine.
+2) Run pip install -r requirements.txt
+3) Edit config.ini. If you are using Oracle, change db_type to ORACLE and change sql_file to point to the ORACLE version of the scripts (*). Change the host and sid for your environment.
+4) Edit the environment variables you selected in config.ini with your username (or domain\username) and password. In Windows, the SET command does this.
+5) You may need to comment out the line 'import cx_Oracle' in query.py.
+5) Run populate_spreadsheet.py config.ini -- hopefully this will run without error, which should take 3-5 minutes.
+6) The Excel file that ends with _SITE should now contain your summary data of the PopMedNet tables. Send that to us along with answers to the other spreadsheet by 1/15/15.
+
+(*) Note: We have not modified the Oracle scripts to work with SCILHS. The Greater Plains Collaborative version is included for reference, but you will need to make changes. In particular, our table names begin with 'pmn', which will have to be appended, and our enrollment start date column has a different name than the 
