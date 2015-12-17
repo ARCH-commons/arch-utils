@@ -1,12 +1,12 @@
-Testing Your i2b2 Mappings 
+# Testing Your i2b2 Mappings 
 
-(Using the CRC Tester)
+## (Using the CRC Tester)
 
-# Introduction
+## Introduction
 
 This guide will help you install the i2b2 workbench and CRC Tester and subsequently run a small set of queries on your ontology, to perform simple tests of your demographics and diagnosis mappings. These are very simple queries that return counts for some of your demographic and diagnosis trees, to ensure they are mapped to something. This does not ensure the mapping is correct, only that you have done a mapping and successfully updated your concept_dimension. These tests can be used by you to detect high-level problems, and you will also send your results to us as a verification that your mapping of demographics and diagnoses is complete.
 
-# Installation and Usage
+## Installation and Usage
 
 1. Download the i2b2 workbench (desktop client): [https://www.i2b2.org/software/index.html](https://www.i2b2.org/software/index.html) (click on ‘i2b2 workbench’ in the lower left)
 
@@ -28,7 +28,7 @@ This guide will help you install the i2b2 workbench and CRC Tester and subsequen
 
 10. When you are satisfied with the results, please take a screenshot of the results and email it to us. Be sure the run query view is large enough to show all the results.
 
-# Common Errors
+## Common Errors
 
 The queries should not return an error, even if you have not yet done mappings. Please try to correct errors before sending results to us.  
 
@@ -48,5 +48,5 @@ Some queries will return counts of 0 even after mapping. However, if terms you h
 
 A sample screenshot using the demodata on the i2b2.org site:
 
-![image alt text](image_0.png)
+![Screenshot of CRC Tester, run on demodata](README-screenshot.png)
 
