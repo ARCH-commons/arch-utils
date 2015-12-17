@@ -1,0 +1,628 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- #CHANGES
+ Rev-02232015: Fixed name changed from SCIHLS to SCILHS; fixed path for images; updated workflow steps
+Rev-02272015: Updated help to remove references to stored procedure and deleting tables
+-->
+
+
+<html>
+
+<body>
+    <div id="SCILHSDiseaseRequest-mainDiv">
+        <div id="SCILHSDiseaseRequest-TABS" class="yui-navset">
+            <ul class="yui-nav">
+                <li id="SCILHSDiseaseRequest-TAB0" class="selected"><a href="#SCILHSDiseaseRequest-TAB0"><em>Specify Data</em></a>
+                </li>
+                <li id="SCILHSDiseaseRequest-TAB1"><a href="#SCILHSDiseaseRequest-TAB1"><em>View Results</em></a>
+                </li>
+                <li id="SCILHSDiseaseRequest-TAB2"><a href="#SCILHSDiseaseRequest-TAB2"><em>Plugin Help</em></a>
+                </li>
+            </ul>
+            <div class="yui-content" id="SCILHSDiseaseRequest-CONTENT">
+
+
+                <!-- #NOTE: Content for the first tab "Specify Data" -->
+
+                <div>
+                    <div class="SCILHSDiseaseRequest-MainContent">
+                        <div class="SCILHSDiseaseRequest-MainContentPad">
+
+                            <div>
+                                <h1 class="i2b2-heading1">SCILHS Data Mart Script Generator</h1>
+
+                                <p>The SCILHS Data mart script generator is designed to assist administrators by simplifying the process of creating new data marts from an existing i2b2 database&#46; This form will gather the appropriate information to generate a database script that can be run on your new database&#46; The script will create the required CRC&#44; Ontology&#44; and Workplace data tables as well as populate them with the requested data from your existing i2b2 database&#46;</p>
+                            </div>
+
+                            <div>
+                                <p><b>REQUIREMENTS&#58;</b>
+                                </p>
+                                <p>The following needs to be done prior to proceeding with this form&#46;</p>
+                                <ol class="i2b2-ordListDecimal">
+                                    <li>The new database schemas where your new data mart will reside needs to be set up&#46;
+                                        <ul class="i2b2-unOrdListDisc">
+                                            <li>The script that is generated from this plug-in will create all the required i2b2 tables&#59; therefore&#44; you do not need to create the i2b2 tables that will reside in your new database schemas&#46;</li>
+                                            <li>However&#44; you do need to know the name of the database schemas so they can be entered into the script correctly&#46;</li>
+                                        </ul>
+
+                                    </li>
+                                    <li>Need to know the cases &#40;i&#46;e&#46; i2b2 Patient Sets&#41; that will be included and / or excluded in the new data mart&#46;</li>
+                                </ol>
+                                <br/>
+                            </div>
+
+                            <table cellpadding="0" cellspacing="0">
+
+                                <tr valign="top">
+                                    <td width="60%">
+                                        <div class="droptrgtlbl">Script Name&#58;</div>
+                                        <br clear="all" />
+                                        <div class="TextMessage">You have the option of entering a name for the script that will be generated&#46; This name will be added as a comment and will not be used when the script is run&#46; It is simply a way to help you organize and keep track of the scripts you are generating&#46;</div>
+                                    </td>
+                                    <td>
+                                        <div class="outputOptions">
+                                            <input type="text" id="SCILHSDiseaseRequest-title" maxlength="255" />
+                                            <div class="SubInputMessage">
+                                                Enter up to 255 characters&#46;
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr id="SCILHSDiseaseRequest-part2b" valign="top" bgcolor="#F0F0F0">
+                                    <td width="60%">
+                                        <div class="droptrgtlbl">Cases&#58;</div>
+                                        <br clear="all" />
+                                        <div class="TextMessage">The new data mart will be created to include a set of cases or cohorts that are based on an existing set of patients&#46; These patient sets were generated in the current i2b2 database and can be added to this form by dragging the name of the patient set from Previous Queries or Workplace to the appropriate box on this form&#46;</div>
+                                    </td>
+                                    <td>
+                                        <div class="droptrgt SDX-PRS" id="SCILHSDiseaseRequest-PRSDROP">
+                                            <div class="prsItem">Drop the Patient Set here</div>
+                                        </div>
+                                        <br clear="all" />
+                                        <div class="SubInputMessage">
+                                            Identify the Cases to be <b>included</b>&#46;
+                                        </div>
+                                        <div id="SCILHSDiseaseRequest-DeleteMsgPRS">
+                                            <br clear="all" />Click the Patient Set to remove it
+                                        </div>
+                                        <br clear="all" />
+                                        <div class="droptrgt SDX-PRS" id="SCILHSDiseaseRequest-EXCPRSDROP">
+                                            <div class="excprsItem">Drop the Patient Set here</div>
+                                        </div>
+                                        <br clear="all" />
+                                        <div class="SubInputMessage">
+                                            Identify the Cases to be <b>excluded</b>&#46;
+                                        </div>
+                                        <div id="SCILHSDiseaseRequest-DeleteMsgExcPRS">
+                                            <br clear="all" />Click the Patient Set to remove it
+                                        </div>
+                                        <br />
+                                    </td>
+                                </tr>
+
+                                <tr id="SCILHSDiseaseRequest-part2c" valign="top">
+                                    <td width="60%">
+                                        <div class="droptrgtlbl">Database System&#58;</div>
+                                        <br clear="all" />
+                                        <div class="TextMessage">Select the type of Database Management System used in your i2b2 environment&#46; This information is necessary to generate the appropriate script for your type of database&#46;</div>
+                                    </td>
+                                    <td>
+                                        <div class="outputOptions">
+                                            <select id="SCILHSDiseaseRequest-dbvendor">
+                                                <option value="sqlserver">SQL Server</option>
+                                                <option value="oracle">Oracle</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr id="SCILHSDiseaseRequest-part2d" valign="top" bgcolor="#F0F0F0">
+                                    <td width="60%">
+                                        <div class="droptrgtlbl">Database Names&#58;</div>
+                                        <br clear="all" />
+                                        <div class="TextMessage">Enter the CRC&#44; and Ontology&#44; database schema names for your <i>existing</i> i2b2 database&#46; This &quot;existing i2b2 database&quot; will be used as the <i>source directory</i> when your new data mart is created&#46; Therefore it is important you enter these schema names correctly&#46;
+                                            <br />
+                                            <br /><i>Example&#58; In the i2b2 demo data database the CRC database schema name is i2b2demodata&#44; the Ontology database schema name is i2b2metadata&#44; and the Workplace database schema name is i2b2workdata&#46;</i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="outputOptions">
+                                            <input type="text" id="SCILHSDiseaseRequest-crcdb" maxlength="100" />
+                                            <div class="SubInputMessage">
+                                                Enter the name of the <b>CRC database schema</b>&#46; Limited to 100 characters&#46;
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="outputOptions">
+                                            <input type="text" id="SCILHSDiseaseRequest-ontdb" maxlength="100" />
+                                            <div class="SubInputMessage">
+                                                Enter the name of the <b>Ontology database schema</b>&#46; Limited to 100 characters&#46;
+                                            </div>
+                                        </div>
+                                        <br />
+<!--
+                                        <div class="outputOptions">
+                                            <input type="text" id="SCILHSDiseaseRequest-workdb" maxlength="100" />
+                                            <div class="SubInputMessage">
+                                                Enter the name of the <b>Workplace database schema</b>&#46; Limited to 100 characters&#46;
+                                            </div>
+                                            <br />
+                                        </div>
+-->
+                                    </td>
+                                </tr>
+
+                                <tr id="ProjectRequest-part2e" valign="top">
+                                    <td width="60%">
+                                        <div class="TextMessage">When the above form is complete&#44; click the "Submit" button to generate the database script&#46;</div>
+                                    </td>
+                                    <td>
+                                        <div id="runBox"><a href="JavaScript:i2b2.SCILHSDiseaseRequest.doSubmit()">Submit</a>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- #NOTE: Content for the second tab "View Results" -->
+
+                <div>
+                    <div class="SCILHSDiseaseRequest-MainContent">
+                        <div class="results-directions">Please return to the <b>Specify Data</b> tab and fill out the request form&#46;</div>
+                        <div class="results-working" style="display:none;">The request has been submitted and the database script is in the process of being generated&#46;</div>
+                        <div class="results-finished" style="display:none;">
+                            <div class="results-text">Below is a customized script that can be used to create the new data mart in your environment&#46; Before you run this script you need to verify the following&#58;
+
+                                <ul class="i2b2-unOrdListDisc">
+                                    <li>The database user has read / write access to the new Ontology database schema&#46;</li>
+                                    <li>i2b2 tables&#44; indexes&#44; and stored procedures do not exist in the new database&#46;</li>
+                                </ul>
+
+                                <ul>
+                                </ul>
+                            </div>
+                            <div id="SCILHSDiseaseRequest-InfoPDO">
+                                <table>
+                                    <tr>
+                                        <th>DB Script</th>
+                                        <td class="InfoPDO-Response"><pre>
+                                        <div id="sqlcreatedm">
+                                        </div></pre>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- #NOTE: Content for the third tab "Plugin Help" -->
+
+                <div>
+                    <div class="SCILHSDiseaseRequest-MainContent">
+                        <div class="SCILHSDiseaseRequest-MainContentPad">
+
+                            <h1 class="i2b2-heading1">SCILHS Data Mart Script Generator</h1>
+
+                            <div class="i2b2-toc">
+                                <h3 class="i2b2-tocHeading">Table of Contents</h3>
+                                <ul class="i2b2-tocItems">
+                                    <li class="i2b2-tocLevel1">
+                                        <a href="#SCILHSDiseaseRequest-HelpWorkflow">Workflow</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel1">
+                                        <a href="#SCILHSDiseaseRequest-HelpInstructions">Instructions</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel2">
+                                        <a href="#SCILHSDiseaseRequest-HelpUsePlugin">Generating Data Mart Scripts in i2b2</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel2">
+                                        <a href="#SCILHSDiseaseRequest-HelpUseScript">How to use the Generated Database Script</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel1">
+                                        <a href="#SCILHSDiseaseRequest-HelpAboutDbScript">About the Database Script</a>
+                                    </li>
+
+                                    <li class="i2b2-tocLevel2">
+                                        <a href="#SCILHSDiseaseRequest-HelpScriptDoes">What the Database Script Does</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel2">
+                                        <a href="#SCILHSDiseaseRequest-HelpTableCreated">Tables Created During This Process</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel1">
+                                        <a href="#SCILHSDiseaseRequest-HelpGlossary">Glossary</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel2">
+                                        <a href="#SCILHSDiseaseRequest-HelpTermsDefined">Database Terms Defined</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel1">
+                                        <a href="#SCILHSDiseaseRequest-HelpAboutUs">About Us</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel1">
+                                        <a href="#SCILHSDiseaseRequest-HelpTermsOfUse">Terms of Use</a>
+                                    </li>
+                                    <li class="i2b2-tocLevel1">
+                                        <a href="SCILHSDiseaseRequest-HelpReferences">References</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <h2 id="SCILHSDiseaseRequest-HelpWorkflow" class="i2b2-heading2">Workflow&#58; Creating New Disease Specific Data Marts</h2>
+                            <p>The following workflow is an outline of the steps to follow when requesting and creating a new disease specific data mart for SCILHS related studies&#46; It is important to note that the first few items need to be done prior to generating the database script to create the new data mart&#46;
+                            </p>
+
+                            <ol class="i2b2-ordListDecimal">
+
+                                <li>In the SCILHS SHRINE Network&#44; the <b>Principal Investigator</b> &#40;&quot;PI&quot;&#41; runs a query to find the appropriate number of cohorts needed for the study&#46;</li>
+
+                                <li>The <b>PI</b> flags this query so it can be easily identified in the local instance of the i2b2&#46; The <i>Site Administrator</i> &#40;&quot;Admin&quot;&#41; will use this query to generate the set of patients to be included in the new disease specific data mart&#46;</li>
+
+                                <div class="i2b2-notePanel">
+                                    <p class="i2b2-noteHeading">
+                                        <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_info.gif">NOTE
+                                    </p>
+                                    <p class="i2b2-noteText">
+                                        Depending on your study&#44; there may be specific case studies that you do not want included in your new disease specific data mart&#46; In this instance you will need to run a <b>second query</b> with the <b>exclusion criteria</b> and flag it so it can be used later on in the data mart creation process&#46;
+                                    </p>
+                                </div>
+
+                                <li>
+                                    The <b>PI</b> submits a request for a new project &#40;data mart&#41; to be created by the local <i>Admin</i>&#46; The request needs to include the following&#58;
+
+                                    <ol class="i2b2-ordListLowerAlpha">
+                                        <li>
+                                            The name of the SHRINE query that will be used by the Admin to generate the list of patients to be <b>included</b> in the new data mart&#46;
+                                        </li>
+                                        <li>
+                                            The name of the SHRINE query that will be used by the Admin to generate the list of patients to be <b>excluded</b> in the new data mart&#46; &#42;<i>Optional</i>&#42;
+                                        </li>
+                                        <li>
+                                            The username of all i2b2 users who can have access to the new project&#46; The list of users should also include the appropriate level of access for each user&#46;
+                                        </li>
+                                    </ol>
+                                </li>
+
+                                <li>The <b>Admin</b> creates the new database schemas for the CRC Data&#44; Ontology Metadata&#44; and Workplace tables&#46;</li>
+
+                                <div class="i2b2-tipPanel">
+                                    <p class="i2b2-tipHeading">
+                                        <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_tip.gif">TIP
+                                    </p>
+                                    <p class="i2b2-tipText">
+                                        Do not create the tables for these schemas as they will be created when running the create data mart script&#46; You do need to make note of the new database schema names as they will be needed when generating the new data mart scripts&#46;
+                                    </p>
+                                </div>
+
+                                <li>The <b>Admin</b> creates the database users for the new schemas&#46;</li>
+
+                                <div class="i2b2-importantPanel">
+                                    <p class="i2b2-importantHeading">
+                                        <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_important.gif">IMPORTANT
+                                    </p>
+                                    <p class="i2b2-importantText">
+                                        Make sure the database user&#40;s&#41; for the new schemas have read &#47; write access&#46;
+                                    </p>
+                                </div>
+
+                                <li>
+                                    In the <b>local i2b2</b>&#44; using the SHRINE query flagged by the <i>PI</i>&#44; the <b>Admin</b> creates the list of patients to be included in the new data mart&#46;
+                                </li>
+
+                                <li>
+                                    The <b>Admin</b> creates the list of patients to be excluded in the new data mart&#46; This step is only necessary if the PI has flagged and identified a second SHRINE query for exclusion&#46;
+                                </li>
+
+                                <li>
+                                    Using the <i>SCILHS Disease Data Mart Request</i> plug-in&#44; the <b>Admin</b> generates the database scripts for creating the new disease specific data mart&#46;
+                                </li>
+
+                                <li>Generate the scripts for creating the new disease specific data mart by logging into the i2b2 Web Client and using the SCILHS Data Mart Script Generator plug-in&#46;</li>
+
+                                <p class="i2b2-resources"><b>Additional Resources</b>&#58; Additional information on how to generate the database script can be found in the section titled <a href="#SCILHSDiseaseRequest-HelpUsePlugin"><i>Generating Data Mart Scripts in i2b2</i></a>&#46;
+                                </p>
+
+                                <li>
+                                    The <b>Admin</b> creates the new disease specific data marts by running the data mart scripts created in the previous step&#46; The data mart script will create the required tables and populate them with the appropriate data from your i2b2 database&#46;
+                                </li>
+
+                                <p class="i2b2-resources"><b>Additional Resources</b>&#58; Additional information on how to use the database script can found in the section titled <a href="#SCILHSDiseaseRequest-HelpUseScript"><i>How to use the Database Script</i></a>&#46;
+                                </p>
+
+
+
+
+                                <li>Update the CRC_DB_LOOKUP&#44; ONT_DB_LOOKUP&#44; and WORK_DB_LOOKUP tables with the new database schema names and project information&#46;</li>
+
+                                <!-- # FUTURE: Add resources once documentation on updating the DB_LOOKUP tables has been added to the wiki -->
+
+                                <li>Setup the new project and it&#39;s users in the i2b2 Admin module&#46;</li>
+
+                                <p class="i2b2-resources"><b>Additional Resources</b>&#58; The i2b2 Installation Guide on the i2b2 Community Wiki will provide additional information about how to setup and manage
+                                    <a href="https://community.i2b2.org/wiki/display/getstarted/14.6+Managing+i2b2+Projects" onclick="window.open(this.href); return false;"><i>Projects</i></a> and
+                                    <a href="https://community.i2b2.org/wiki/display/getstarted/14.5+Managing+i2b2+Users" onclick="window.open(this.href); return false;"><i>Users</i></a> in the i2b2 Admin module&#46;
+                                </p>
+
+                                <li>The <b>Admin</b> notifies the PI that the new project has been setup and is available for use&#46;</li>
+                            </ol>
+
+                            <h2 id="SCILHSDiseaseRequest-HelpInstructions" class="i2b2-heading2">Instructions</h2> 
+                            <p>The SCILHS Data Mart Script Generator plug-in is designed to assist administrators with the creation of a new disease specific data mart&#46; The plug-in will use the information entered on the form to generate a database script&#46; This database script will create a new data mart from an existing one&#46;</p>
+
+                            <h3 id="SCILHSDiseaseRequest-HelpUsePlugin" class="i2b2-heading3">Generating Data Mart Scripts in i2b2</h3>
+                            <p>The following instructions explain how to use the <i>SCILHS Disease Data Mart Request</i> plug-in to generate the scripts for creating a disease specific data mart in your environment&#46;</p>
+
+                            <ol class="i2b2-ordListDecimal">
+                                <li>Verify the following information is entered on the <i>Specify Data</i> page&#46;
+                                </li>
+
+                                <dl>
+                                    <dt><b>Script Name&#58;</b></dt>
+                                    <dd>
+                                        <p>This is an optional field that can be used to help organize and keep track of the various scripts you may be running&#46; The name entered will be added to the script as a comment and will not be used when the script is fun against the database&#46;</p>
+                                        <p></p>
+                                    </dd>
+                                    <dt><b>Cases&#58;</b></dt>
+                                    <dd>
+                                        <p>In simplest terms&#44; cases are a set of existing i2b2 patients that will be <b>included</b> or <b>excluded</b> when the new data mart is created&#46; In order to populate teh new data mart with the appropriate patients and their observations&#44; it is necessary you identify the cases to be included in the new data mart&#46; Identifying the cases to be excluded is optional&#46;
+                                        </p>
+                                        <p>The patient sets to be included or excluded are generated in the existing i2b2 database and can be added to the form by dragging the name of the patient set from Previous Queries or Workplace to the appropriate box&#46;</p>
+                                        <p></p>
+                                    </dd>
+
+                                    <dt><b>Database System&#58;</b></dt>
+                                    <dd>
+                                        <p>Depending on your environment&#44; you will need to select the Database Management System that is appropriate for your i2b2 database&#46; The plug-in uses this information to generate a script that is specific to your type of database&#46; Currently there are two options&#59; SQL Server and Oracle&#46;</p>
+                                        <p></p>
+                                    </dd>
+
+                                    <dt><b>Database Names&#58;</b></dt>
+                                    <dd>
+                                        <p>The database names are the database schema names for your <b>existing</b> i2b2 database&#46; The script will use this information as the source for the data that will be inserted into the new data mart&#46; Therefore&#44; it is important that you correctly enter the names for your existing i2b2 database so the appropriate data is selected&#46;</p>
+                                    </dd>
+                                </dl>
+
+                                <br />
+
+                                <li>Click the <b>Submit</b> button to generate the database script&#46;</li>
+
+                                <div class="i2b2-importantPanel">
+                                    <p class="i2b2-importantHeading">
+                                        <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_important.gif">IMPORTANT
+                                    </p>
+                                    <p class="i2b2-importantText">
+                                        The information entered on the <i>Specify Data</i> page will be used to define the variables that will be used by the script when it is run in your environment&#46; Therefore it is important you have defined everything correctly before submitting the form&#46;
+                                    </p>
+                                </div>
+
+                                <li>
+                                    The page will automatically change to the View Results tab once the SCILHS Data Mart plug-in finishes creating the database script&#46;
+                                </li>
+
+                                <li>Create a new file on a local machine in your environment&#46;</li>
+
+                                <li>Copy and paste the script into a file in your local environment&#46;</li>
+
+                                <div class="i2b2-tipPanel">
+                                    <p class="i2b2-tipHeading">
+                                        <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_tip.gif">TIP
+                                    </p>
+                                    <p class="i2b2-tipText">
+                                        To make it easier for users the plug-in will highlight the entire script in one simple step&#46; All you need to do is use your mouse to click on the text of the generated script. At this point the text for the entire script will be highlighted&#46; To copy the text and paste it in your new file you can use one of the following standard keyboard commands&#58;
+                                        <br />
+                                        <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Windows&#58;</b>
+                                        <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Copy = Ctrl&#43;C
+                                        <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Paste = Ctrl&#43;V
+
+                                        <br />
+                                        <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Macintosh&#58;</b>
+                                        <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Copy = Command&#43;C
+                                        <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Paste = Command&#43;V
+                                    </p>
+
+                                </div>
+
+                                <li>Save the file containing the newly generated script&#46;</li>
+                            </ol>
+
+                            <h3 id="SCILHSDiseaseRequest-HelpUseScript" class="i2b2-heading3">How to use the Generated Database Script</h3> 
+                            <p>The information in this section includes instructions on how to use the database script once it has been generated via the plug-in&#46;</p>
+
+
+                            <ol class="i2b2-ordListDecimal">
+                                <li>Log into the application you use to manage your databases&#46;</li>
+                                <li>Connect to your <b>NEW</b> database&#46;</li>
+                                <li>Open the database script you previously created&#46;</li>
+                                <li>Run the script from your <b>NEW</b> database&#46;</li>
+
+                                <div class="i2b2-importantPanel">
+                                    <p class="i2b2-importantHeading">
+                                        <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_important.gif">IMPORTANT
+                                    </p>
+                                    <p class="i2b2-importantText">
+                                        The database script creates all the required i2b2 tables&#44; indexes&#44; and stored procedures when it is run against your new database schema&#46; If a table with the same name already exists in the new database schema then the script will stop running&#46;
+                                        <br />
+                                        <br />If the tables do exist in your new database then you will need to delete them <b>before</b> you proceed with running the scripts&#46; Make sure you also delete the indexes and stored procedures if they also exist in your new environment&#46;
+
+                                        <br />
+                                        <br />If you ran the script and it stopped running because of existing tables&#44; then you will need to manually delete the existing tables, indexes and stored procedures&#59; This includes any tables the script was able to create before it encountered the problem&#46; Once you have deleted the table&#40;s&#41;&#46; you will need to run the script again&#46;
+                                    </p>
+                                </div>
+
+                                <li>“<b>Finished creation of datamart</b>” will display once the script finishes running&#46; At this point your new CRC and Ontology tables have been created and the appropriate data inserted into them&#46;</li>
+                            </ol>
+
+                            <h2 id="SCILHSDiseaseRequest-HelpAboutDbScript" class="i2b2-heading2">About the Database Script</h2>
+
+                            <h3 id="SCILHSDiseaseRequest-HelpScriptDoes" class="i2b2-heading3">What the Database Script Does</h3> 
+                            <p>The following is an outline of what the database script will do when you run it against your new database&#46;</p>
+
+                            <ol class="i2b2-ordListDecimal">
+
+                                <li>Drops and creates the required CRC&#44; Ontology&#44; and Workplace tables&#46; &#40;see list of tables created in the section called &quot;<a href="#SCILHSDiseaseRequest-HelpTableCreated"><i>Tables Created During This Process</i></a>&quot;&#41;</li>
+
+                                <li>Populates the QT_QUERY_RESUT_TYPE&#44; QT_QUERY_STATUS_TYPE&#44; and QT_PRIVELEGE tables with data from your existing i2b2 database&#46;</li>
+
+                                <li>Creates the set of patients to use when selecting the data to insert into the patient oriented tables&#46; This set of patients is based on the &quot;<i>include</i>&quot; and &quot;<i>exclude</i>&quot; patient lists you entered when submitting the form&#46;</li>
+
+                                <li>Populates the Ontology tables with data from your existing i2b2 database&#46;</li>
+
+                                <li>Populates the WORKPLACE_ACCESS table with the required data &#40;Shared folder&#41;&#46;</li>
+
+                                <li>Populates the OBSERVATION_FACT&#44; PATIENT_DIMENSION&#44; and VISIT_DIMENSION tables with selected data&#46; All observations&#44; patients&#44; and visit data for the patients listed in your patient set will be inserted into the appropriate tables&#46;</li>
+
+                                <li>Populates the remaining dimension tables &#40;CONCEPT_DIMENSION&#44; MODIFIER_DIMENSION and PROVIDER_DIMENSION&#41; with data from your existing i2b2 database&#46;</li>
+
+                                <li>Populates the mapping tables with self-mapping data&#46;</li>
+                                <li>Creates the required indexes for the i2b2 tables&#46;</li>
+                                <li>Creates the required stored procedures for the CRC data mart &#46;</li>
+
+                            </ol>
+
+                            <h3 id="SCILHSDiseaseRequest-HelpTableCreated" class="i2b2-heading3">Tables Created During This Process</h3> 
+                            <p>The following tables are created when you run the database script&#46;</p>
+
+                            <h4 class="i2b2-heading4">CRC Dimension and Observation Tables</h4>
+
+                            <ul class="i2b2-unOrdListNone1">
+                                <li>CONCEPT_DIMENSION</li>
+                                <li>MODIFIER_DIMENSION</li>
+                                <li>OBSERVATION_FACT</li>
+                                <li>PATIENT_DIMENSION</li>
+                                <li>PROVIDER_DIMENSION</li>
+                                <li>VISIT_DIMENSION</li>
+                            </ul>
+
+                            <h4 class="i2b2-heading4">CRC Mapping Tables</h4>
+
+                            <ul class="i2b2-unOrdListNone1">
+                                <li>PATIENT_MAPPING</li>
+                                <li>ENCOUNTER_MAPPING</li>
+                            </ul>
+
+                            <h4 class="i2b2-heading4">CRC QT Tables</h4>
+
+                            <ul class="i2b2-unOrdListNone1">
+                                <li>QT_ANALYSIS_PLUGIN</li>
+                                <li>QT_ANALYSIS_PLUGIN_RESULT_TYPE</li>
+                                <li>QT_BREAKDOWN_PATH</li>
+                                <li>QT_PATIENT_ENC_COLLECTION</li>
+                                <li>QT_PATIENT_SET_COLLECTION</li>
+                                <li>QT_PDO_QUERY_MASTER</li>
+                                <li>QT_PRIVILEGE</li>
+                                <li>QT_QUERY_INSTANCE</li>
+                                <li>QT_QUERY_MASTER</li>
+                                <li>QT_QUERY_RESULT_INSTANCE</li>
+                                <li>QT_QUERY_RESULT_TYPE</li>
+                                <li>QT_QUERY_STATUS_TYPE</li>
+                                <li>QT_XML_RESULT</li>
+                            </ul>
+
+
+                            <h4 class="i2b2-heading4">Ontology Tables</h4>
+
+                            <ul class="i2b2-unOrdListNone1">
+                                <li>CODE_LOOKUP</li>
+                                <li>PCORNET_DEMO</li>
+                                <li>PCORNET_DIAG</li>
+                                <li>PCORNET_ENC</li>
+                                <li>PCORNET_PROC</li>
+                                <li>PCORNET_VITAL</li>
+                                <li>PCORNET_ENROLL</li>
+                                <li>SCHEMES</li>
+                                <li>TABLE_ACCESS</li>
+                            </ul>
+
+                            <!-- #FUTURE: At this time the script does not look at the TABLE_ACCESS table. This feature may be added back in the future. -->
+                            <!--
+                            <div class="i2b2-notePanel">
+                                <p class="i2b2-noteHeading">
+                                    <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_info.gif">NOTE
+                                </p>
+                                <p class="i2b2-noteText">
+                                    The database script takes into consideration that some sites have more than one i2b2 metadata table&#46; The script will create and copy the data from all the metadata tables in your existing i2b2 database&#46; This is done by looking at the TABLE_ACCESS table to determine the names of the metadata tables that need to be created&#46;
+                                </p>
+                            </div>
+-->
+                            <h4 class="i2b2-heading4">Workplace Tables</h4>
+
+                            <ul class="i2b2-unOrdListNone1">
+                                <li>WORKPLACE</li>
+                                <li>WORKPLACE_ACCESS</li>
+                            </ul>
+
+
+                            <h2 id="SCILHSDiseaseRequest-HelpGlossary" class="i2b2-heading2">Glossary</h2>
+
+                            <h3 id="SCILHSDiseaseRequest-HelpTermsDefined" class="i2b2-heading3">Database Terms Defined</h3>
+                            <p>To avoid confusion the following table contains database terms that are used within this document and may have different meanings depending upon the database management system you use&#46;</p>
+
+
+                            <table class="i2b2-table" id="i2b2DbDefinitions">
+                                <tr>
+                                    <th class="i2b2-tableHeader">Term</th>
+                                    <th class="i2b2-tableHeader">Oracle Definition <sup>1</sup>
+                                    </th>
+                                    <th class="i2b2-tableHeader">SQL Server Definition <sup>2</sup>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td>Database</td>
+                                    <td>An Oracle database is a collection of data treated as a unit&#46; The purpose of a database is to store and retrieve related information&#46;</td>
+                                    <td>A collection of information&#44; tables&#44; and other objects organized and presented to serve a specific purpose&#44; such as searching&#44; sorting&#44; and recombining data&#46; Databases are stored in files&#46;</td>
+                                </tr>
+                                <tr>
+                                    <td>Instance</td>
+                                    <td>A system global area &#40;SGA&#41; and the Oracle background processes constitute an Oracle database instance&#46; Every time a database is started&#44; a system global area is allocated and Oracle background processes are started&#46; The SGA is deallocated when the instance shuts down&#46;</td>
+                                    <td>A copy of SQL Server that is running on a computer&#46;</td>
+                                </tr>
+                                <tr>
+                                    <td>Schema</td>
+                                    <td>Collection of database objects&#44; including logical structures such as tables&#44; views&#44; sequences&#44; stored procedures&#44; synonyms&#44; indexes&#44; clusters&#44; and database links&#46; A schema has the name of the user who controls it&#46;</td>
+                                    <td>The names of tables&#44; fields&#44; data types&#44; and primary and foreign keys of a database&#46; Also known as the database structure&#46;
+                                        <br />&#42;Microsoft refers to this as the “database schema”&#46;
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div class="i2b2-notePanel">
+                                <p class="i2b2-noteHeading">
+                                    <img class="i2b2-panelImg" src="/webclient/js-i2b2/cells/plugins/standard/SCILHSDiseaseRequest/assets/images/icon_info.gif">NOTE
+                                </p>
+                                <p class="i2b2-noteText">
+                                    The behavior of schemas changed in SQL Server 2005&#46; Schemas are no longer equivalent to database users&#59; each schema is now a distinct namespace that exists independently of the database user who created it&#46; In other words&#44; a schema is simply a container of objects&#46; A schema can be owned by any user&#44; and its ownership is transferable&#46; <sup>3</sup>
+                                </p>
+                            </div>
+
+                            <h2 id="SCILHSDiseaseRequest-HelpAboutUs" class="i2b2-heading2">About Us</h2>
+                            <p>This plugin was created by Mike Mendis and Janice Donahoe</p>
+
+                            <h2 id="SCILHSDiseaseRequest-HelpTermsOfUse" class="i2b2-heading2">Terms of Use</h2>
+                            <p>This plugin is distributed with the i2b2 Web Client Framework and may be used free of charge&#46;</p>
+
+                            <h2 id="SCILHSDiseaseRequest-HelpReferences" class="i2b2-heading2">References</h2>
+
+                            <ul class="i2b2-unOrdListNone1">
+                                <li><sup>1</sup>  <a href="http://docs.oracle.com/en/">Oracle Help Center</a>&#44; &#40;n&#46;d&#46;&#41;&#46; <a href="http://docs.oracle.com/cd/B19306_01/server.102/b14220/glossary.htm">Database Concepts&#44; Glossary</a>&#46;</li>
+
+                                <li><sup>2</sup>  <a href="http://msdn.microsoft.com/en-us/">MSDN Library</a>&#44; &#40;n&#46;d&#46;&#41;&#46; <a href="http://msdn.microsoft.com/en-us/library/ms165911(v=sql.100).aspx">Glossary &#40;SQL Server 2008&#41;</a>&#46;</li>
+
+                                <li><sup>3</sup>  <a href="http://technet.microsoft.com/en-us/">Microsoft Technet Library</a>&#44; &#40;n&#46;d&#46;&#41;&#46; <a href="http://technet.microsoft.com/en-us/library/ms190387(v=SQL.105).aspx">User-Schema Separation&#46;</a>
+                                </li>
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
