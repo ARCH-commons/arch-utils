@@ -1,0 +1,506 @@
+/* NOTE CSS for main plugin wrapper */
+
+DIV#SCILHSDiseaseRequest-mainDiv {
+    padding: 0px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#runBox {
+    background: #6677AA;
+    border: 1px solid #667788;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-family: arial, helvetica;
+    font-size: 11px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    color: #FFF;
+    cursor: pointer;
+    margin: 15px 5px 15px 190px;
+    width: 102px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#runBox a:hover {
+    background-color: #7687bf;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#runBox a {
+    color: #FFF;
+    display: block;
+    text-decoration: none;
+}
+div.workarea {
+    padding: 10px;
+    float: left;
+    width: 90%;
+}
+/* */
+
+ul.draglist {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    background: #f7f7f7;
+    border: 1px solid gray;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+ul.draglist li {
+    margin: 1px;
+    cursor: move;
+    zoom: 1;
+}
+ul.draglist_alt {
+    position: relative;
+    width: 200px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 20px;
+}
+ul.draglist_alt li {
+    margin: 1px;
+    cursor: move;
+}
+li.list1 {
+    background-color: #D1E6EC;
+    border: 1px solid #7EA6B2;
+}
+li.list2 {
+    background-color: #D8D4E2;
+    border: 1px solid #6B4C86;
+}
+/* */
+
+/* NOTE CSS for tab background */
+
+DIV#SCILHSDiseaseRequest-TABS DIV.yui-content {
+    background: #FFF;
+}
+DIV#SCILHSDiseaseRequest-TABS DIV.SCILHSDiseaseRequest-MainContent {
+    background: #FFF;
+    border: solid #63758C;
+    border-width: 1px 0;
+    overflow: auto;
+}
+DIV#SCILHSDiseaseRequest-TABS DIV.SCILHSDiseaseRequest-MainContentPad {
+    padding: 10px 10px;
+}
+/* */
+
+/* NOTE CSS for the Specify Data tab */
+
+DIV#SCILHSDiseaseRequest-mainDiv DIV.TextMessage {
+    text-align: left;
+    color: #666;
+    padding: 5px 20px 15px 50px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.SubInputMessage {
+    text-align: left;
+    color: #666;
+    width: 95%;
+    font-size: 11px;
+    margin: 10px 0px 0px 5px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgtlbl {
+    padding: 5px 0px;
+    text-align: right;
+    font-weight: bold;
+    text-align: left;
+    color: #666;
+    margin: 5px 10px 0px 50px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt {
+    padding: 5px 10px;
+    background: #DEEBEF;
+    margin-top: 15px;
+    text-align: left;
+    border: 1px solid #63758C;
+    overflow: hidden;
+    float: left;
+    width: 90%;
+    white-space: nowrap;
+}
+DIV#SCILHSDiseaseRequest-mainDiv #SCILHSDiseaseRequest-DeleteMsgPRS {
+    font-size: 11px;
+    margin: 2px 0 0 0px;
+    display: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv #SCILHSDiseaseRequest-DeleteMsgExcPRS {
+    font-size: 11px;
+    margin: 2px 0 0 0px;
+    display: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv #SCILHSDiseaseRequest-DeleteMsgConcept {
+    font-size: 11px;
+    margin: 2px 0 0 0px;
+    display: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv #SCILHSDiseaseRequest-DeleteMsgExcConcept {
+    font-size: 11px;
+    margin: 2px 0 0 0px;
+    display: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv #SCILHSDiseaseRequest-DeleteMsgIC {
+    font-size: 11px;
+    margin: 2px 0 0 0px;
+    display: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv #SCILHSDiseaseRequest-DeleteMsgExcIC {
+    font-size: 11px;
+    margin: 2px 0 0 0px;
+    display: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .concptItem {
+    padding: 5px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .concptItem:hover {
+    background-color: #FCC;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .excconcptItem {
+    padding: 5px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .excconcptItem:hover {
+    background-color: #FCC;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .prsItem {
+    padding: 5px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .prsItem:hover {
+    background-color: #FCC;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .excprsItem {
+    padding: 5px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .excprsItem:hover {
+    background-color: #FCC;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .icItem {
+    padding: 5px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .icItem:hover {
+    background-color: #FCC;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .excicItem {
+    padding: 5px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.droptrgt .excicItem:hover {
+    background-color: #FCC;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.outputOptionsLbl {
+    padding: 6px 0px;
+    width: 80px;
+    text-align: right;
+    float: left;
+    font-weight: bold;
+    color: #666;
+    margin: 15px 10px 0px 0px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.outputOptions {
+    padding: 5px 10px;
+    margin-top: 15px;
+    text-align: center;
+    float: left;
+    width: 90%;
+    border: 0px solid #63758C;
+    overflow: hidden;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.outputOptions input,
+select {
+    width: 100%;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.outputOptions form {
+    margin: 0;
+    padding: 0;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV.outputOptions span {
+    margin-right: 15px;
+}
+/* */
+
+/* NOTE CSS for the View Results tab */
+
+DIV#SCILHSDiseaseRequest-TABS DIV.results-directions {
+    padding: 10px;
+    text-align: left;
+}
+DIV#SCILHSDiseaseRequest-TABS DIV.results-working {
+    margin: 10px;
+    text-align: left;
+}
+DIV#SCILHSDiseaseRequest-TABS DIV.results-text {
+    margin: 10px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#SCILHSDiseaseRequest-InfoPDO TABLE {
+    margin: 0 10px 10px 10px;
+    border-collapse: collapse;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#SCILHSDiseaseRequest-InfoPDO TABLE TH {
+    width: 150px;
+    border: solid 1px #63758C;
+    background-color: #CEDBEF;
+    padding: 5px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#SCILHSDiseaseRequest-InfoPDO TABLE TD {
+    width: 300px;
+    overflow: auto;
+    border: solid 1px #63758C;
+    background-color: #DEEBEF;
+    padding: 5px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#SCILHSDiseaseRequest-InfoPDO .InfoPDO-Request {
+    padding: 0px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#SCILHSDiseaseRequest-InfoPDO .InfoPDO-Response {
+    padding: 0px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#SCILHSDiseaseRequest-InfoPDO .originalXML {
+    height: 150px;
+    overflow: hidden;
+    padding: 0px;
+    margin: 0px;
+}
+DIV#SCILHSDiseaseRequest-mainDiv DIV#SCILHSDiseaseRequest-InfoPDO TABLE TD DIV PRE {
+    margin: 0px;
+    width: 300px;
+    height: 140px;
+    display: block;
+    overflow: scroll;
+    padding: 5px;
+}
+/* */
+
+/* NOTE CSS for the Plug-in Help tab */
+
+DIV#SCILHSDiseaseRequest-TABS H1 {
+    margin: 0px 0px 15px 0px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #42558C;
+    text-align: center;
+}
+DIV#SCILHSDiseaseRequest-TABS H2 {
+    margin: 50px 0px 15px 0px;
+    color: #42558C;
+    text-align: left;
+    font-size: 22px;
+    font-weight: bold;
+}
+DIV#SCILHSDiseaseRequest-TABS H3 {
+    color: #42558C;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 15px;
+}
+DIV#SCILHSDiseaseRequest-TABS H4 {
+    color: #42558C;
+    text-align: left;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 15px;
+}
+DIV#SCILHSDiseaseRequest-TABS HR {
+    margin: 0;
+}
+/* */
+
+/* NOTE i2b2 Styles (Help Documentation) */
+
+p.i2b2-resources {
+    margin: 15px 0px 50px 30px;
+}
+/* */
+
+/* NOTE i2b2 toc styles */
+
+.i2b2-toc {
+    margin-top: 25px;
+    margin-bottom: 35px;
+}
+.i2b2-tocHeading {
+    margin-bottom: 25px;
+    font-weight: bold;
+    font-size: 22px;
+    color: #42558C;
+}
+.i2b2-tocItems {
+    list-style-type: none;
+    margin-bottom: 25px;
+}
+.i2b2-tocLevel1 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.i2b2-tocLevel2 {
+    margin-bottom: 15px;
+    text-indent: 40px;
+}
+/* */
+
+/* NOTE i2b2 panel styles */
+
+.i2b2-importantPanel,
+.i2b2-warningPanel,
+.i2b2-notePanel,
+.i2b2-tipPanel {
+    width: auto;
+    margin: 35px 15px 50px 15px;
+    padding: 7px 15px 15px 10px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 10px;
+    clear: left;
+    text-align: left;
+    line-height: 17.3333px;
+    font-weight: 400;
+    color: #333333;
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-image: none;
+    background-origin: padding-box;
+    background-position: 0%;
+    background-repeat: repeat;
+    background-size: auto;
+}
+.i2b2-importantPanel {
+    background-color: #FFFFDD;
+    border-color: #F7DF92;
+}
+.i2b2-warningPanel {
+    background-color: #FFE7E7;
+    border-color: #DF9898;
+}
+.i2b2-notePanel {
+    background-color: #E0EFFF;
+    border-color: #9EB6D4;
+    border-color: #9EB6D4;
+}
+.i2b2-tipPanel {
+    background-color: #DDFADE;
+    border-color: #9EC495;
+}
+.i2b2-importantHeading,
+.i2b2-warningHeading,
+.i2b2-noteHeading,
+.i2b2-tipHeading {
+    font-family: sans-serif, Verdana;
+    font-size: 13px;
+    font-weight: bold;
+}
+.i2b2-importantText,
+.i2b2-warningText,
+.i2b2-noteText,
+.i2b2-tipText {
+    margin: 0px 0px 0px 30px;
+    font-family: sans-serif, Verdana;
+    font-size: 12px;
+}
+.i2b2-importantHeading,
+.i2b2-importantText {
+    color: #5B5533;
+}
+.i2b2-warningHeading,
+.i2b2-warningText {
+    color: #722A28;
+}
+.i2b2-noteHeading,
+.i2b2-noteText {
+    color: #193E87;
+}
+.i2b2-tipHeading,
+.i2b2-tipText {
+    color: #424B43;
+}
+.i2b2-panelImg {
+    width: 15px;
+    height: 15px;
+    border: 0px;
+    margin: 0px 10px 0px 5px;
+    float: left;
+}
+/* */
+
+/* NOTE i2b2 table styles */
+
+table#i2b2DbDefinitions {
+    margin: 45px 10px 45px 10px;
+    border-top: 2px solid #365F91;
+    border-bottom: 2px solid #365F91;
+    color: #365F91;
+}
+table#i2b2DbDefinitions th {
+    font-weight: bold;
+    padding: 12px;
+    border-bottom: 2px solid #365F91;
+}
+table#i2b2DbDefinitions td {
+    padding: 12px;
+}
+table#i2b2DbDefinitions tr:nth-child(even) {
+    background-color: #DBE5F1;
+}
+/* */
+
+/* NOTE i2b2 list styles */
+
+.i2b2-ordListDecimal {
+    list-style-type: decimal;
+    margin: 10px 0px 25px 5px;
+}
+ol.i2b2-ordListDecimal li {
+    margin: 15px 0px 8px 0px;
+}
+.i2b2-ordListLowerAlpha {
+    list-style-type: lower-alpha;
+    margin: 5px 0px 30px 0px;
+}
+.i2b2-unOrdListDisc {
+    list-style-type: disc;
+    list-style-position: outside;
+    margin: 10px 0px 25px 5px;
+}
+.i2b2-unOrdListDisc li {
+    margin: 10px 0px 8px 0px;
+}
+.i2b2-unOrdListNone1 {
+    list-style-type: none;
+    margin: 15px 0px 35px 0px;
+}
+.i2b2-unOrdListNone2 {
+    list-style-type: none;
+    margin: 10px 0px 50px 25px;
+}
+.i2b2-unOrdListNone2 li {
+    margin: 10px 0px 8px 50px;
+}
