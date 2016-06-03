@@ -156,7 +156,6 @@ update loyalty_cohort_filter_sets set bit_list = substring(bit_list,2,99999), fi
 
 insert into loyalty_cohort_filter_sets (filter_set,num_filters,bit_list,filter_list) values (0,0,'0','None')
 
-
 --*****************************************************************************************
 --*****************************************************************************************
 --*** GET TEMP INFO ABOUT PATIENTS
@@ -181,17 +180,17 @@ to "C". These diagnoses are ICD-9 codes V20.2 (routine infant or child health ch
 V70.0 (routine general medical examination at a health care facility), and V72.31
 (routine gynecological examination).
 */
-
+select * from table_access
 insert into loyalty_cohort_concept_type (concept_cd, concept_type)
 	select concept_cd, concept_type
 	from (
 		select concept_cd,
-			min(case when concept_path like '\i2b2\Diagnoses\%' and concept_cd in ('DIAG|ICD9:V20.2','DIAG|ICD9:V70.0','DIAG|ICD9:V72.31') then 'C'
-				when concept_path like '\i2b2\Diagnoses\%' then 'D'
-				when concept_path like '\i2b2\Medications\%' then 'M'
-				when concept_path like '\i2b2\Labtests\%' then 'L'
-				when concept_path like '\i2b2\procedures\%' then 'P'
-				when concept_path like '\i2b2\Vital Signs\%' then 'V'
+			min(case when concept_path like '\PCORI\DIAGNOSIS\%' and concept_cd in ('DIAG|ICD9:V20.2','DIAG|ICD9:V70.0','DIAG|ICD9:V72.31') then 'C'
+				when concept_path like '\PDIA\%' then 'D'
+				when concept_path like '\PCORI\MEDICATION\%' then 'M'
+				when concept_path like '\PCORI\LAB_RESULT_CM\%' then 'L'
+				when concept_path like '\PCORI\PROCEDURE\%' then 'P'
+				when concept_path like '\PCORI\VITAL\%' then 'V'
 				else null end) concept_type
 		from concept_dimension
 		group by concept_cd
