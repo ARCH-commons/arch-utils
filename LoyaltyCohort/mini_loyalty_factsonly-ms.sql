@@ -32,7 +32,7 @@ select
     o.patient_num, count(*) num_facts
     into #miniloyalty_patient_facts
 	from observation_fact o 
-    left join patient_dimension p on p.patient_num=o.patient_num
+    inner join patient_dimension p on p.patient_num=o.patient_num
 	where concept_cd in (select concept_cd from concept_dimension where concept_path like '\P%') -- Should expand to \PCORI\ if your paths are standard
     and o.start_date>='1/1/2010'
 	group by o.patient_num
@@ -50,7 +50,7 @@ GO
                 from (
                     select p.patient_num, floor(age_in_years_num/10) a, sex_cd s, isnull(f.num_facts,0) f
                     from patient_dimension p
-                        inner join #miniloyalty_patient_facts f
+                        left join #miniloyalty_patient_facts f
                             on p.patient_num = f.patient_num
                 ) t
               ) t group by PATIENT_NUM,k
