@@ -33,6 +33,7 @@ select
     into #miniloyalty_patient_facts
 	from observation_fact o 
     inner join patient_dimension p on p.patient_num=o.patient_num
+    inner join visit_dimension v on v.patient_num=o.patient_num -- Also only count patients with visits
 	where concept_cd in (select concept_cd from concept_dimension where concept_path like '\P%') -- Should expand to \PCORI\ if your paths are standard
     and o.start_date>='1/1/2010'
 	group by o.patient_num
@@ -50,13 +51,29 @@ GO
                 from (
                     select p.patient_num, floor(age_in_years_num/10) a, sex_cd s, isnull(f.num_facts,0) f
                     from patient_dimension p
-                        left join #miniloyalty_patient_facts f
+                        inner join #miniloyalty_patient_facts f -- Inner join bc 0-fact patients are never included in transform
                             on p.patient_num = f.patient_num
                 ) t
               ) t group by PATIENT_NUM,k
          ) t
             left join #with_proc p on p.patient_num=t.patient_num
         group by k order by k
+GO
+
+-- Characterize low fact count pts
+select * into lowfact_dc from
+(select vw2.c_name, k, avg(f) avg_fact_count, count(*) c from observation_fact f inner join pcornet_master_vw vw on vw.C_BASECODE=f.CONCEPT_CD inner join
+    pcornet_master_vw vw2 on vw.C_PATH=vw2.C_FULLNAME inner join
+(select patient_num, k, f from
+(select patient_num, k, sum(f) f from
+    (select patient_num, ntile(100) over (order by f, patient_num) k,f
+    from (
+        select p.patient_num, isnull(f.num_facts,0) f
+        from patient_dimension p
+            inner join #miniloyalty_patient_facts f -- Inner join bc 0-fact patients are never included in transform
+                on p.patient_num = f.patient_num
+    ) t
+  ) t group by PATIENT_NUM,k) t where k<6) t on t.patient_num=f.patient_num group by k, vw2.c_name) t where c>=10 order by k asc, c desc
 GO
 
 select sum( p) from fact_pcnt
@@ -68,4 +85,6 @@ select count(distinct patient_num) from #with_proc
 select * from miniloyalty
 GO
 select * from fact_pcnt
+GO
+select * from lowfact_dc order by k asc,avg_fact_count asc,c desc
 GO
