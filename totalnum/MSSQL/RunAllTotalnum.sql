@@ -1,6 +1,7 @@
 -----------------------------------------------------------------------------------------------------------------
 -- Procedure to run totalnum counts on all tables in table_access that have a key like PCORI_
 -- Depends on the TOTALNUM script at http://github.com/SCILHS-utils/totalnum , which must be run first
+-- 11/3/16 - now supports optional table access column, c_obsfact, which defines a custom obsfact table for totalnum counting
 -----------------------------------------------------------------------------------------------------------------
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'RunTotalnum') AND type in (N'P', N'PC'))
@@ -10,9 +11,15 @@ GO
 create procedure dbo.RunTotalnum as 
 
 DECLARE @sqltext NVARCHAR(4000);
+DECLARE @sqlcurs NVARCHAR(4000);
+
+IF COL_LENGTH('table_access','c_obsfact') is NOT NULL 
 declare getsql cursor local for
-select 'exec run_all_counts '+c_table_name
-from TABLE_ACCESS where c_visualattributes like '%A%' and c_table_cd like 'PCORI%'
+select 'exec run_all_counts '+c_table_name+','+c_obsfact from TABLE_ACCESS where c_visualattributes like '%A%' and c_table_cd like 'PCORI%'
+ELSE 
+declare getsql cursor local for select 'exec run_all_counts '+c_table_name  from TABLE_ACCESS where c_visualattributes like '%A%' and c_table_cd like 'PCORI%'
+
+
 
 begin
 OPEN getsql;
@@ -27,3 +34,4 @@ END
 CLOSE getsql;
 DEALLOCATE getsql;
 end
+GO

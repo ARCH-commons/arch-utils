@@ -5,15 +5,19 @@
 --- 1) If your fact table is in a different database or schema, search and replace 'observation_fact' with your database name, e.g.,
 --   i2b2_facts.dbo.observation_fact. 
 --  2) Run this script, which will create the stored procedures and execute them on pcornet_lab.
---  3) EXEC RUN_ALL_COUNTS <mymetadata_table> GO , replacing <mymetadata_table> with whichever table you want to update the totalnums.
+--  3) EXEC RUN_ALL_COUNTS <mymetadata_table>[, <myobsfact_table>] GO , replacing <mymetadata_table> with whichever table you want to update the totalnums,
+--      and optionally including <myobsfact_table>
 
 -- Developed by Griffin Weber, Harvard Medical School
 -- Modified by Lori Phillips, Partners HealthCare
 -- Minor edits to support modifiers by Jeff Klann, Harvard Medical School
 -- Aug 2015
 -- Bugfix in modifiers counts 12/11/15
+-- Support multiple fact tables 11/3/16- BUT NOW USES *GLOBAL TEMP TABLES* SO BE CAREFUL!
+-- Speedup to not run irrelevant count procedures - 12/19/16
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PAT_COUNT_BY_CONCEPT]') AND type in (N'P', N'PC'))
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PAT_COUNT_MODIFIERS]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[PAT_COUNT_MODIFIERS]
 GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[PAT_COUNT_BY_CONCEPT]') AND type in (N'P', N'PC'))
@@ -34,7 +38,7 @@ GO
 
 -- Modified from PAT_COUNT_BY_CONCEPT by Jeff Klann, PhD
 -- Note: This is somewhat "quick and dirty" - it assumes modifier_cd is unique and does not check that modifier modifies a valid concept code
-CREATE PROCEDURE [dbo].[PAT_COUNT_MODIFIERS]  (@metadataTable varchar(50))
+CREATE PROCEDURE [dbo].[PAT_COUNT_MODIFIERS]  @metadataTable varchar(50), @obsfact varchar(50) = 'observation_fact'
 
 AS BEGIN
 declare @sqlstr nvarchar(4000)
@@ -57,6 +61,9 @@ set @sqlstr = 'select c_fullname, c_basecode
 		and m_applied_path != ''@'' '
 		
 execute sp_executesql @sqlstr;
+
+if exists(select top 1 NULL from conceptCountOnt)
+BEGIN
 
 -- Convert the ontology paths to integers to save space
 
@@ -88,10 +95,10 @@ select distinct c_basecode, path_num
 alter table #ConceptPath add primary key (c_basecode, path_num)
 
 -- Create a list of distinct concept-patient pairs
-
-select distinct modifier_cd, patient_num
-	into #ConceptPatient
-	from observation_fact f with (nolock)
+SET @sqlstr = 'select distinct modifier_cd, patient_num
+	into ##ConceptPatient
+	from '+@obsfact+' f with (nolock)'
+EXEC sp_executesql @sqlstr
 
 -- Bugfix 12/10/15 - modifier_cd is nullable so primary key creation fails
 --   Fastest solution is just to skip the primary key - making the column non-nullable takes a very long time.
@@ -101,7 +108,7 @@ select distinct modifier_cd, patient_num
 
 select distinct c.path_num, f.patient_num
 	into #PathPatient
-	from #ConceptPatient f
+	from ##ConceptPatient f
 		inner join #ConceptPath c
 			on f.modifier_cd = c.c_basecode
 
@@ -131,12 +138,14 @@ select o.*, isnull(c.num_patients,0) num_patients into finalCountsByConcept
 --	print @sqlstr
 	execute sp_executesql @sqlstr
 
+    DROP TABLE ##ConceptPatient
 
+    END
 
 END;
 GO
 
-CREATE PROCEDURE [dbo].[PAT_COUNT_BY_CONCEPT]  (@metadataTable varchar(50))
+CREATE PROCEDURE [dbo].[PAT_COUNT_BY_CONCEPT]  (@metadataTable varchar(50), @obsfact varchar(50) = 'observation_fact')
 
 AS BEGIN
 declare @sqlstr nvarchar(4000)
@@ -159,6 +168,9 @@ set @sqlstr = 'select c_fullname, c_basecode
 		and m_applied_path = ''@'' '
 		
 execute sp_executesql @sqlstr;
+
+if exists(select top 1 NULL from conceptCountOnt)
+BEGIN
 
 -- Convert the ontology paths to integers to save space
 
@@ -191,17 +203,18 @@ alter table #ConceptPath add primary key (c_basecode, path_num)
 
 -- Create a list of distinct concept-patient pairs
 
-select distinct concept_cd, patient_num
-	into #ConceptPatient
-	from observation_fact f with (nolock)
+SET @sqlstr = 'select distinct concept_cd, patient_num
+	into ##ConceptPatient
+	from '+@obsfact+' f with (nolock)'
+EXEC sp_executesql @sqlstr
 
-alter table #ConceptPatient add primary key (concept_cd, patient_num)
+alter table ##ConceptPatient add primary key (concept_cd, patient_num)
 
 -- Create a list of distinct path-patient pairs
 
 select distinct c.path_num, f.patient_num
 	into #PathPatient
-	from #ConceptPatient f
+	from ##ConceptPatient f
 		inner join #ConceptPath c
 			on f.concept_cd = c.c_basecode
 
@@ -231,7 +244,9 @@ select o.*, isnull(c.num_patients,0) num_patients into finalCountsByConcept
 --	print @sqlstr
 	execute sp_executesql @sqlstr
 
+    DROP TABLE ##CONCEPTPATIENT
 
+    END
 
 END;
 GO
@@ -239,9 +254,10 @@ GO
 -- Based on similar script created by Griffin Weber, Harvard Medical School
 -- Modified by Lori Phillips, Partners HealthCare
 -- Feb 2015
+-- Skips if not relevant, Dec 2016, Jeff Klann, PhD
 
 
-CREATE PROCEDURE [dbo].[PAT_COUNT_BY_PROVIDER]  (@metadataTable varchar(50))
+CREATE PROCEDURE [dbo].[PAT_COUNT_BY_PROVIDER]  (@metadataTable varchar(50), @obsfact varchar(50) = 'observation_fact')
 
 AS BEGIN
 declare @sqlstr nvarchar(4000)
@@ -264,6 +280,10 @@ set @sqlstr = 'select c_fullname, c_basecode
 		and m_applied_path = ''@'' '
 		
 execute sp_executesql @sqlstr;
+
+if exists(select top 1 NULL from provider_ont)
+
+BEGIN
 
 -- Convert the ontology paths to integers to save space
 
@@ -296,9 +316,10 @@ alter table #ProviderPath add primary key (c_basecode, path_num)
 
 -- Create a list of distinct provider-patient pairs
 
-select distinct provider_id, patient_num
+SET @sqlstr = 'select distinct provider_id, patient_num
 	into #ProviderPatient
-	from observation_fact f with (nolock)
+	from '+@obsfact+' f with (nolock)'
+EXEC sp_executesql  @sqlstr
 
 alter table #ProviderPatient add primary key (provider_id, patient_num)
 
@@ -338,7 +359,9 @@ select o.*, isnull(c.num_patients,0) num_patients into finalProviderCounts
 	execute sp_executesql @sqlstr
 
 
+    DROP TABLE #PROVIDERPATIENT
 
+END
 
 END;
 GO
@@ -346,7 +369,7 @@ GO
 -- Modified by Lori Phillips, Partners HealthCare
 -- Feb 2015
 
-CREATE PROCEDURE [dbo].[PAT_COUNT_IN_EQUAL] (@tabname varchar(50))
+CREATE PROCEDURE [dbo].[PAT_COUNT_IN_EQUAL] (@tabname varchar(50), @obsfact varchar(50) = 'observation_fact')
 AS BEGIN
 
 declare @sqlstr nvarchar(4000),
@@ -371,6 +394,8 @@ declare @sqlstr nvarchar(4000),
 
 	alter table ontInOperator add numpats int
 
+  if exists(select top 1 NULL from ontInOperator)
+  BEGIN
 --------------  start of cursor e -------------------------------
 	Declare e CURSOR
 		Local Fast_Forward
@@ -390,7 +415,7 @@ declare @sqlstr nvarchar(4000),
 				set @dimcode = '''' +  replace(@dimcode,'''','''''') + ''''
 			end
 			set @sqlstr='update ontInOperator set 
-             numpats =  (select count(distinct(patient_num)) from observation_fact  
+             numpats =  (select count(distinct(patient_num)) from '+@obsfact+'   
                 where ' + @facttablecolumn + ' in (select ' + @facttablecolumn + ' from ' + @tablename + ' where '+ @columnname + ' ' + @operator +' ' + @dimcode +' ))
             where c_fullname = ' + ''''+ @concept + ''''+ ' and numpats is null'
 
@@ -406,14 +431,12 @@ declare @sqlstr nvarchar(4000),
 
 --------------  end of cursor e -------------------------------
 
- 
-
 	set @sqlstr='update a set c_totalnum=b.numpats from '+@tabname+' a, ontInOperator b '+
 	'where a.c_fullname=b.c_fullname '
 --	print @sqlstr
 	execute sp_executesql @sqlstr
 
-
+  END
 
 END;
 GO
@@ -422,7 +445,7 @@ GO
 -- Feb 2015
 
 
-CREATE PROCEDURE [dbo].[PAT_VISIT_COUNTS] (@tabname varchar(50))
+CREATE PROCEDURE [dbo].[PAT_VISIT_COUNTS] (@tabname varchar(50), @obsfact varchar(50) = 'observation_fact')
 AS BEGIN
 
 declare @sqlstr nvarchar(4000),
@@ -445,6 +468,9 @@ declare @sqlstr nvarchar(4000),
     execute sp_executesql @sqlstr
 
 	alter table ontPatVisitDims add numpats int
+
+    if exists(select top 1 NULL from ontPatVisitDims)
+    BEGIN
 
 --------------  start of cursor e -------------------------------
 	Declare e CURSOR
@@ -492,6 +518,7 @@ declare @sqlstr nvarchar(4000),
 	execute sp_executesql @sqlstr
 
 
+END
 
 END;
 GO
@@ -501,7 +528,7 @@ GO
 -- August 2015
 
 
-CREATE PROCEDURE [dbo].[RUN_ALL_COUNTS] (@tablename varchar(50))
+CREATE PROCEDURE [dbo].[RUN_ALL_COUNTS] (@tablename varchar(50), @obsfact varchar(50) = 'observation_fact')
 AS BEGIN
 
     declare @sqlstr nvarchar(4000)
@@ -511,11 +538,11 @@ AS BEGIN
 	execute sp_executesql @sqlstr
 
 
-exec dbo.PAT_VISIT_COUNTS @tablename
-exec dbo.PAT_COUNT_BY_CONCEPT @tablename
-exec dbo.PAT_COUNT_BY_PROVIDER @tablename
-exec dbo.PAT_COUNT_IN_EQUAL @tablename
-exec dbo.PAT_COUNT_MODIFIERS @tablename
+exec dbo.PAT_VISIT_COUNTS @tablename, @obsfact
+exec dbo.PAT_COUNT_BY_CONCEPT @tablename, @obsfact
+exec dbo.PAT_COUNT_BY_PROVIDER @tablename, @obsfact
+exec dbo.PAT_COUNT_IN_EQUAL @tablename, @obsfact
+exec dbo.PAT_COUNT_MODIFIERS @tablename, @obsfact
 
 	set @sqlstr='update ' + @tablename + ' set c_totalnum=null where c_visualattributes = ''CA'' and c_totalnum = 0'
 --	print @sqlstr
@@ -527,6 +554,6 @@ END;
 GO
 
 -- Change to whichever metadata table you are interested in
-EXEC RUN_ALL_COUNTS pcornet_lab
+-- EXEC RUN_ALL_COUNTS pcornet_lab
 GO
 
