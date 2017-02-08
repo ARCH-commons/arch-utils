@@ -69,7 +69,9 @@ import sys
 oracle_i2b2metadata_string = ''
 #Arg 2
 crc_schemaname_arg = ''
-#Arg 3
+#Arg 3 - new!
+oracle_i2b2crc_string = ''
+#Arg 4
 oracle_auditdb_string = ''
 
 metadata_table_list = []
@@ -89,7 +91,7 @@ ls_header = ["fullname","c_basecode", "cnt"]
 g_arraysize = 500
 
 #Set to true if you want to debug
-debug = True
+debug = False
 
 #Audit timestamp string
 audit_ts =''
@@ -244,8 +246,8 @@ select distinct C_FULLNAME, C_BASECODE, C_TABLENAME from pcornet_tablename
 
 ################################################################################
 def read_db_demodata_concept_fact(sTableName):
-    i2b2metadata = cx_Oracle.connect(oracle_i2b2metadata_string)
-    cursor_d = i2b2metadata.cursor()
+    i2b2crcdata = cx_Oracle.connect(oracle_i2b2crc_string)
+    cursor_d = i2b2crcdata.cursor()
     #Sets this cursors arraysize to the value defined at the top of the script
     #This is done to improve database recall performance
     cursor_d.arraysize = g_arraysize
@@ -279,7 +281,7 @@ EXISTS (select C_BASECODE from pcornet_tablename m where f.concept_cd = m.C_BASE
     print(time.strftime('%a %H:%M:%S') + "---" + "Finished processing concept_patient rows locally \n")
 
     cursor_d.close()
-    i2b2metadata.close()
+    i2b2crcdata.close()
 
 
 
@@ -287,6 +289,8 @@ EXISTS (select C_BASECODE from pcornet_tablename m where f.concept_cd = m.C_BASE
 def read_db_demodata_patient_vist(sTableName):
     i2b2metadata = cx_Oracle.connect(oracle_i2b2metadata_string)
     cursor_d = i2b2metadata.cursor()
+    i2b2crcdata = cx_Oracle.connect(oracle_i2b2crc_string)
+    cursor_d2 = i2b2crcdata.cursor()
     #Sets this cursors arraysize to the value defined at the top of the script
     #This is done to improve database recall performance
     cursor_d.arraysize = g_arraysize
@@ -337,7 +341,7 @@ where
             print(time.strftime('%a %H:%M:%S') + "---" + "Executing patient vist SQL:")
             if debug:
                 print(sql_query_curr)
-            cursor_d.execute(sql_query_curr)
+            cursor_d2.execute(sql_query_curr)
             PATIENTS = cursor_d.fetchall()
             set_patients = set()
             for row in PATIENTS:
@@ -349,16 +353,21 @@ where
 
     cursor_d.close()
     i2b2metadata.close()
+    cursor_d2.close()
+    i2b2crcdata.close()
     pass
 
 ################################################################################
 def read_db_modifier(sTableName):
     i2b2metadata = cx_Oracle.connect(oracle_i2b2metadata_string)
     cursor_d = i2b2metadata.cursor()
+    i2b2crcdata = cx_Oracle.connect(oracle_i2b2crc_string)
+    cursor_d2 = i2b2crcdata.cursor()
     #Sets this cursors arraysize to the value defined at the top of the script
     #This is done to improve database recall performance
     cursor_d.arraysize = g_arraysize
 
+    # Note this requires the metadata user to have access to modifier_dimension in the CRC schema...
     sql = """
 select distinct m.C_FULLNAME, i.modifier_cd
 from ---pcornet_tablename--- m inner join crcschema.modifier_dimension i on m.C_DIMCODE = i.MODIFIER_PATH
@@ -378,12 +387,12 @@ from crcschema.OBSERVATION_FACT
 where modifier_cd = '---modifier_cd---'
         """
         sql_query = sql_query.replace("---modifier_cd---",modifier_cd)
-        slq_query = sql_query.replace("crcschema", crc_schemaname_arg)
+        sql_query = sql_query.replace("crcschema", crc_schemaname_arg)
         print(time.strftime('%a %H:%M:%S') + "---" + "Executing modifier vist SQL:")
         if debug:
             print(sql_query)
 
-        cursor_d.execute(sql_query)
+        cursor_d2.execute(sql_query)
         PATIENTS = cursor_d.fetchall()
 
         set_patients = set()
@@ -396,6 +405,8 @@ where modifier_cd = '---modifier_cd---'
 
     cursor_d.close()
     i2b2metadata.close()
+    cursor_d2.close()
+    i2b2crcdata.close()
     pass
 
 
@@ -662,8 +673,12 @@ def main():
     crc_schemaname_arg = sys.argv[2] if len(sys.argv) >=3 else 'NONE'
     print("CRC Schema name is: " + crc_schemaname_arg)
 
+    #Set up crc_connection_string
+    crc_schemaname_arg = sys.argv[3] if len(sys.argv) >=3 else oracle_i2b2metadata_string
+    print("CRC Oracle Connect String: " + crc_schemaname_arg)
+
     #Set up audit db name
-    oracle_auditdb_string = sys.argv[3] if len(sys.argv) >=4 else 'NONE'
+    oracle_auditdb_string = sys.argv[4] if len(sys.argv) >=4 else 'NONE'
     print("Audit db string is: " + oracle_auditdb_string)
 
     #Set up audit timestamp
