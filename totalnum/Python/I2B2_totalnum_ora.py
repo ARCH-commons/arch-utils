@@ -674,11 +674,11 @@ def main():
     print("CRC Schema name is: " + crc_schemaname_arg)
 
     #Set up crc_connection_string
-    crc_schemaname_arg = sys.argv[3] if len(sys.argv) >=3 else oracle_i2b2metadata_string
+    crc_schemaname_arg = sys.argv[3] if len(sys.argv) >=4 else oracle_i2b2metadata_string
     print("CRC Oracle Connect String: " + crc_schemaname_arg)
 
     #Set up audit db name
-    oracle_auditdb_string = sys.argv[4] if len(sys.argv) >=4 else 'NONE'
+    oracle_auditdb_string = sys.argv[4] if len(sys.argv) >=5 else 'NONE'
     print("Audit db string is: " + oracle_auditdb_string)
 
     #Set up audit timestamp
