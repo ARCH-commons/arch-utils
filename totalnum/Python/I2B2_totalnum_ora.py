@@ -657,6 +657,7 @@ def process(sTableName):
 def main():
     #These will be set with a parameters passed in at script call time
     global oracle_i2b2metadata_string
+    global oracle_i2b2crc_string
     global crc_schemaname_arg
     global oracle_auditdb_string
     global audit_ts
@@ -674,8 +675,8 @@ def main():
     print("CRC Schema name is: " + crc_schemaname_arg)
 
     #Set up crc_connection_string
-    crc_schemaname_arg = sys.argv[3] if len(sys.argv) >=4 else oracle_i2b2metadata_string
-    print("CRC Oracle Connect String: " + crc_schemaname_arg)
+    oracle_i2b2crc_string = sys.argv[3] if len(sys.argv) >=4 else oracle_i2b2metadata_string
+    print("CRC Oracle Connect String: " + oracle_i2b2crc_string)
 
     #Set up audit db name
     oracle_auditdb_string = sys.argv[4] if len(sys.argv) >=5 else 'NONE'
