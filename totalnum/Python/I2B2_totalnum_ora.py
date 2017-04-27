@@ -89,7 +89,7 @@ ls_header = ["fullname","c_basecode", "cnt"]
 g_arraysize = 500
 
 #Set to true if you want to debug
-debug = False
+debug = True
 
 #Audit timestamp string
 audit_ts =''
@@ -292,11 +292,11 @@ def read_db_demodata_patient_vist(sTableName):
     cursor_d.arraysize = g_arraysize
 
     sql = """
-select C_FULLNAME, C_BASECODE, C_FACTTABLECOLUMN, C_TABLENAME, C_COLUMNNAME, C_COLUMNDATATYPE, C_OPERATOR, C_DIMCODE from ---pcornet_tablename--- where C_FULLNAME ='---C_FULLNAME---'
+select C_FULLNAME, C_BASECODE, C_FACTTABLECOLUMN, C_TABLENAME, C_COLUMNNAME, C_COLUMNDATATYPE, C_OPERATOR, C_DIMCODE from ---pcornet_tablename--- where C_FULLNAME ='---C_FULLNAME---' AND C_VISUALATTRIBUTES LIKE '%A%'
     """
 
     for fullname, tabletype in dict_fullname_type.items():
-        if tabletype != "PATIENT_DIMENSION" and tabletype != "VISIT_DIMENSION"  :
+        if tabletype.upper() != "PATIENT_DIMENSION" and tabletype.upper() != "VISIT_DIMENSION"  :
             continue
         sql_curr = sql.replace("---pcornet_tablename---",sTableName)
         sql_curr = sql_curr.replace("---C_FULLNAME---",getOriginalFullname(fullname))
@@ -324,7 +324,7 @@ select C_FULLNAME, C_BASECODE, C_FACTTABLECOLUMN, C_TABLENAME, C_COLUMNNAME, C_C
 
             sql_query = """
 select distinct patient_num
-from crcschema.---C_TABLENAME--- f
+from crcschema.---C_TABLENAME--- 
 where
 ---C_COLUMNNAME--- ---C_OPERATOR--- ---C_DIMCODE---
             """
@@ -410,7 +410,7 @@ def write_csv(sTableName):
         if cnt == 0:
             cnt=""
         #Dont add "\\","\\PCORI","\\PCORI_MOD"
-        if printedFullname <> "\\" and printedFullname <> "\\PCORI" and printedFullname <> "\\PCORI_MOD" and printedFullname <> "\\i2b2":
+        if printedFullname != "\\" and printedFullname != "\\PCORI" and printedFullname != "\\PCORI_MOD" and printedFullname != "\\i2b2":
             ls_result.append([printedFullname, getConceptCD(fullname), cnt])
 
     print(time.strftime('%a %H:%M:%S') + "---" + "Outputing result to CSV file...")
@@ -434,7 +434,7 @@ def write_audit_db(sTableName):
         printedFullname = getOriginalFullname(fullname)
 
         #Dont add "\\","\\PCORI","\\PCORI_MOD"
-        if printedFullname <> "\\" and printedFullname <> "\\PCORI" and printedFullname <> "\\PCORI_MOD" and printedFullname <> "\\i2b2":
+        if printedFullname != "\\" and printedFullname != "\\PCORI" and printedFullname != "\\PCORI_MOD" and printedFullname != "\\i2b2":
             ls_result.append([audit_ts, printedFullname, getConceptCD(fullname), cnt])
 
     auditdbcon = cx_Oracle.connect(oracle_auditdb_string)
@@ -484,7 +484,7 @@ def getMetadataTableList():
     #This is done to improve database recall performance
     cursor_d.arraysize = g_arraysize
 
-    sql = """SELECT DISTINCT C_TABLE_NAME FROM TABLE_ACCESS"""
+    sql = """SELECT DISTINCT C_TABLE_NAME FROM TABLE_ACCESS WHERE C_VISUALATTRIBUTES LIKE '%A%'"""
     cursor_d.execute(sql)
     metadataTableNamesResultSet = cursor_d.fetchall()
     for row in metadataTableNamesResultSet:
@@ -632,7 +632,7 @@ def process(sTableName):
     # only if you passed in an audit
     # DB connection string
     ##  #########################  ##
-    if oracle_auditdb_string <> 'NONE':
+    if oracle_auditdb_string != 'NONE':
         print(time.strftime('%a %H:%M:%S') + "---" + "Writing to audit DB... ")
         write_audit_db(sTableName)
 
