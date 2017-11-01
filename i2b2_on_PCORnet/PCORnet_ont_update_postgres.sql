@@ -21,3 +21,17 @@ GO
 -- Undo the change on diagnosis for modifiers to enable diag modifiers
 update i2b2metadata.pcornet_diag set c_facttablecolumn='modifier_cd' where c_facttablecolumn like '%.modifier_cd'
 GO
+
+-- Undo a default ontology change inserted to match to demodata in i2b2
+UPDATE "i2b2metadata"."pcornet_diag"
+SET "c_basecode"='P'
+WHERE "c_hlevel"=2 AND "c_fullname"='\PCORI_MOD\PDX\P\' AND "c_name"='Principal' AND "c_synonym_cd"='N'
+GO
+UPDATE "i2b2metadata"."pcornet_diag"
+SET "c_basecode"='S'
+WHERE "c_hlevel"=2 AND "c_fullname"='\PCORI_MOD\PDX\S\' AND "c_name"='Secondary' AND "c_synonym_cd"='N'
+GO
+UPDATE "i2b2metadata"."pcornet_diag"
+SET "c_basecode"='X'
+WHERE "c_hlevel"=2 AND "c_fullname"='\PCORI_MOD\PDX\X\' AND "c_name"='Unable to classify' AND "c_synonym_cd"='N'
+GO
