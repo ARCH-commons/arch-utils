@@ -9,6 +9,8 @@ title 'gaussianFuzz.sas';
 * in the data set, the computer picks a randomly-generated number based off of a Gaussian distribution with a mean of ‘0’ and
 * a standard deviation of ‘2.5.’ That randomly generated number is rounded to the nearest integer, and then added to that aggregate
 * count. 
+**** STEP 2 is not implemented currently. *******
+*
 * 8/21/2017 - Numeric fields (except those excluded) are now Gaussian-fuzzed +/- 3
 * 10/12/2016 - for each dataset in a directory, set vars w low values (below a threshold) to special missing value (.X);
 * -- if value = 0, ok to leave it (per JK MN);
@@ -40,14 +42,14 @@ title 'gaussianFuzz.sas';
 
 *-- change this to your threshold value;
 
-%let threshold= 11;    * -- all values LESS THAN this (but > 0) are set to  .X  (special missing value);
+%let threshold= 11;    * -- all values LESS THAN this (but > 0) are set to  .T  (special missing value);
 
 *-- enter a list of valid variables names to exclude;
 *   -- case does not matter,  use space as delimiter between variable names;
 *-- if no variables are listed below, then all numeric variables, ;
 *   except those with a format, will be fuzzed or subjected to a threshold test;
 
-%let excludeList=Level YoungChild mean std min P1 P5 P10 P25 P75 P90 P95 P99 max ADULT; 
+%let excludeList=Level YoungChild ADULT; 
 
 *-------------------------------------------------------------------------;
 * DO NOT EDIT BELOW THIS LINE;
@@ -55,7 +57,7 @@ title 'gaussianFuzz.sas';
 *-- define macros
 
 *----------------------------;
-%MACRO fixNum(fname,fname2);      *-- fix numeric variables so that any > 0 and < threshold are replaced with .X;
+%MACRO fixNum(fname,fname2);      *-- fix numeric variables (fuzz or threshold test);
 *----------------------------;
 * fname - input dataset;
 * fname2 - output dataset with low numeric values replaced with special missing value;
@@ -81,13 +83,11 @@ run;
 *-- numeric variables in current dataset (&fname);
 
 data temp2; 
-  length has_N $1.;
  set sashelp.vcolumn (where=(libname=upcase(scan("&fname",1,'.'))
   and memname=upcase(scan("&fname",2,'.')) and type="num" and format = ''));    
   *-- note: value for type is lower case; *-- Also grab only non-dates (jgk);
   length varname $50.;
-  varname=upcase(name); *-- jgk fix 1/18 ;
-  if varname='N' then call symput('has_N','yes');
+  varname=upcase(name);
   KEEP varname;
 run;
 
@@ -126,6 +126,17 @@ data temp; length orig_N 8.;
   end;
   drop orig_N lenK i dummyVar;
 run;  
+
+*-- drop N variable if it did not exist in original dataset;
+
+proc sql;
+  select max(N) into :maxN from temp;
+quit;
+
+%IF &maxN = . %THEN %DO;
+  data temp; set temp (drop=N);
+  run;
+%END;
 
 *-- copy dataset with changes (temp) to a permanent dataset with same name as original;
 
