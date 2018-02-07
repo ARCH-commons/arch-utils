@@ -20,12 +20,14 @@ title 'gaussianFuzz.sas';
 * 10/25/2015 - add option to exclude variables;
 * -- also, modified program to write tempid.dat file to SAS TEMP directory, not WORK directory;
 
-* 1/7/2018;
-* -- fuzz all numeric variables except those with a format or those on an exclude list;
+* 2/6/2018;
+* -- fuzz all numeric variables except those with a date format or those on an exclude list;
 * -- if the dataset contained a variable named N, apply a threshold test;
 *    -- if N > 0 and < threshold, set all variables to missing (.T) ;
 *       except those with a format or those on an exclude list;
-*    -- if N = 0, undo fuzz, thus leaving N equal to 0;
+*    -- if N = 0 then reset it back to 0 (unfuzz);
+*       -- note: all stats (e.g. mean max cumulp25) should already be missing ;
+*          and this program does not change them;
 
 *-------------------------------------------------------------------------;
 *-------------------------------------------------------------------------;
@@ -47,9 +49,9 @@ title 'gaussianFuzz.sas';
 *-- enter a list of valid variables names to exclude;
 *   -- case does not matter,  use space as delimiter between variable names;
 *-- if no variables are listed below, then all numeric variables, ;
-*   except those with a format, will be fuzzed or subjected to a threshold test;
+*   except those with a date format, will be fuzzed or subjected to a threshold test;
 
-%let excludeList=Level YoungChild ADULT; 
+%let excludeList=Level YoungChild ADULT CritNum seq RxYear RxMonth seg incident seq; 
 
 *-------------------------------------------------------------------------;
 * DO NOT EDIT BELOW THIS LINE;
@@ -70,32 +72,43 @@ quit;
 
 *-- user-entered list of variable names;
 
-data temp1;
+data temp1; 
+ SET sashelp.vcolumn (where=(libname=upcase(scan("&fname",1,'.'))
+    and memname=upcase(scan("&fname",2,'.')) and type="num"))
+    end=eof;
   length excludeList $1000. varname $50.;
-  excludelist=catx(' ',"&excludelist2",'dummyVariable'); *-- jgk bugfix 8/17, 1/18;
-  do i=1 to &excludehowmany;
-    varname=scan(excludelist,i);
-    OUTPUT;
+  retain excludeList;
+  if _n_=1 then excludelist=catx(' ',"&excludelist2",'dummyVariable');
+  if format in: ('DAT' 'DD' 'DT' 'HH' 'MDY' 'MM' 'MON' 'TIM' 'TOD'
+    'TWMDY' 'WEEK' 'WORDAT' 'YEAR' 'YY') 
+	then excludeList=catx(' ',excludelist,name); *-- add vars w date and/or time format to exclude list;
+  if eof then do;
+    numVars=countW(excludeList);  *-- count words (var names) in excludeList;
+    do i=1 to numVars;
+      varname=upcase(scan(excludelist,i));
+	  if varname ne 'DUMMYVARIABLE' then OUTPUT;
+    end;
   end;
   keep varname;
 run;
+proc sort data=temp1 NODUPKEY; by varname;
+run;
 
 *-- numeric variables in current dataset (&fname);
-
+*-- note: value for type is lower case, value for format is upper case; 
+*-- exclude numeric variables with a date or time format;
+*   -- use GET (>= truncated string) because in: operator invalid w sql;
 data temp2; 
  set sashelp.vcolumn (where=(libname=upcase(scan("&fname",1,'.'))
-  and memname=upcase(scan("&fname",2,'.')) and type="num" and format = ''));    
-  *-- note: value for type is lower case; *-- Also grab only non-dates (jgk);
+  and memname=upcase(scan("&fname",2,'.')) and type="num")); 
   length varname $50.;
   varname=upcase(name);
   KEEP varname;
 run;
-
-*-- merge the two lists of variable names;
-
-proc sort data=temp1; by varname;
 proc sort data=temp2; by varname;
 run;
+
+*-- merge the two lists of variable names;
 
 data temp3; merge temp1 (in=in_excludeList) temp2 (in=in_numVars);
   by varname;
@@ -118,12 +131,13 @@ data temp; length orig_N 8.;
   if lenK > 0 then do;
     do i=1 to dim(A);
       A(i)= A(i) + floor(rand("Gaussian",0,2.5));  *-- fuzz all keepVars;
+	  A(i)= round(A(i),5);                         *-- round to nearest 5;
       if 0 < orig_N < &threshold then do;          *-- can be true only if dataset has an N variable;
         A(i) = .T;                                 *-- if orig_N fails threshold test, ;
-      end;                                         *    then set all keepVars to missing;
-	  else if orig_N=0 then N=0;                   *-- if orig_N was 0, N=0 (not fuzzed);
-    end;
-  end;
+      end;                                         *    then set all keepVars to special missing value;
+	end;      *-- end of: do i= ...;
+  end;        *-- end of: if lenK>0...;
+  if orig_N=0 then N=0;                            *-- reset N to 0 if orig_N was 0;
   drop orig_N lenK i dummyVar;
 run;  
 
@@ -132,6 +146,8 @@ run;
 proc sql;
   select max(N) into :maxN from temp;
 quit;
+
+%PUT MAX VALUE OF N IS &MAXN;
 
 %IF &maxN = . %THEN %DO;
   data temp; set temp (drop=N);
