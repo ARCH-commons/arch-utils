@@ -13,7 +13,7 @@ CREATE VIEW pcornetdemodata.multifact_diagnosis_view
     confidence_num, sourcesystem_cd, update_date, download_date, import_date, upload_id
 )
 AS
--- PDX---
+-- PDX AND DX_SOURCE---
 SELECT  cast(patid as int4) ,
         CASE when (DX_TYPE = '09') then CONCAT('ICD9:' , DX)
              when (DX_TYPE = '10') then CONCAT('ICD10:' , DX)
@@ -22,34 +22,7 @@ SELECT  cast(patid as int4) ,
         1,
         PROVIDERID ,
         ADMIT_DATE ,
-        PDX , --PDX
-        cast(null as varchar), --observation_blob
-        ENC_TYPE ,
-        DX_TYPE , --tval_char
-        cast(null as decimal),
-        DX_SOURCE , --valueflag_cd
-        cast(null as decimal), --quantity_num
-        cast(null as varchar),
-        cast(null as timestamp), --end_date
-        cast(null as varchar),
-        cast(null as decimal),
-        cast(null as varchar), --sourcesystem_cd
-        cast(null as timestamp),
-        cast(null as timestamp),
-        cast(null as timestamp),
-        cast(null as int)
-FROM pcornetdemodata.pmndiagnosis
-UNION ALL
---- DX SOURCE ---
-SELECT  cast(patid as int4) ,
-        CASE when (DX_TYPE = '09') then CONCAT('ICD9:' , DX)
-             when (DX_TYPE = '10') then CONCAT('ICD10:' , DX)
-        END, 
-        cast(ENCOUNTERID as int4) ,
-        1,
-        PROVIDERID ,
-        ADMIT_DATE ,
-        'DX_SOURCE:'||DX_SOURCE , --PDX
+        unnest(array[PDX, DX_SOURCE]) AS MODIFIER_CD, 
         cast(null as varchar), --observation_blob
         ENC_TYPE ,
         DX_TYPE , --tval_char

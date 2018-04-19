@@ -3,39 +3,10 @@
 -- Run this on an instatiation of the PCORnet CDM
 -- For use with i2b2-on-PCORnet tools
 -- By Matthew Joss with contributions from Jeff Klann, PhD
+-- Fixes from Postgres and better implementation of modifiers 4/9/18 - Jeff Klann, PhD
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE VIEW [dbo].[MULTIFACT_CONDITION_VIEW]
-(patient_num, concept_cd, encounter_num, instance_num , provider_id, start_date, modifier_cd, observation_blob,
-    valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd,
-    confidence_num, sourcesystem_cd, update_date, download_date, import_date, upload_id
-)
-AS
-SELECT  patid ,
-        CASE when (CONDITION_TYPE = '09') then CONCAT('ICD9:' , condition)
-             when (CONDITION_TYPE = '10') then CONCAT('ICD10:' , condition)
-        END, 
-        cast(encounterid as int), --may need to do a convert function to convert from varchar to an int
-        1,
-        '@',
-        report_date,
-        CONDITION_STATUS,
-        cast(null as varchar(max)), --obs_blob
-        cast(null as varchar),
-        CONDITION_TYPE, --tval_char
-        cast(null as decimal),
-        cast(null as varchar) , -- valueflag_cd
-        cast(null as decimal),
-        cast(null as varchar),
-        RESOLVE_DATE , --end_date
-        CONDITION_SOURCE , --location_cd
-        cast(null as decimal),
-        cast(null as varchar),
-        cast(null as datetime), --update_date
-        cast(null as datetime),
-        ONSET_DATE , --import_date
-        cast(null as int)
-FROM pmncondition
+DROP VIEW MULTIFACT_DIAGNOSIS_VIEW
 GO
 CREATE VIEW [dbo].[MULTIFACT_DIAGNOSIS_VIEW]
 (patient_num, concept_cd, encounter_num, instance_num , provider_id, start_date, modifier_cd, observation_blob,
@@ -43,7 +14,7 @@ CREATE VIEW [dbo].[MULTIFACT_DIAGNOSIS_VIEW]
     confidence_num, sourcesystem_cd, update_date, download_date, import_date, upload_id
 )
 AS
--- PDX---
+-- PDX and DX_SOURCE ---
 SELECT  patid ,
         CASE when (DX_TYPE = '09') then CONCAT('ICD9:' , DX)
              when (DX_TYPE = '10') then CONCAT('ICD10:' , DX)
@@ -52,7 +23,7 @@ SELECT  patid ,
         1,
         PROVIDERID ,
         ADMIT_DATE ,
-        PDX , --PDX
+        modifier_cd,
         cast(null as varchar(max)), --observation_blob
         ENC_TYPE ,
         DX_TYPE , --tval_char
@@ -69,33 +40,7 @@ SELECT  patid ,
         cast(null as datetime),
         cast(null as int)
 FROM pmndiagnosis
-UNION ALL
---- DX SOURCE ---
-SELECT  patid ,
-        CASE when (DX_TYPE = '09') then CONCAT('ICD9:' , DX)
-             when (DX_TYPE = '10') then CONCAT('ICD10:' , DX)
-        END, 
-        ENCOUNTERID ,
-        1,
-        PROVIDERID ,
-        ADMIT_DATE ,
-        'DX_SOURCE:'+DX_SOURCE , --PDX
-        cast(null as varchar(max)), --observation_blob
-        ENC_TYPE ,
-        DX_TYPE , --tval_char
-        cast(null as decimal),
-        DX_SOURCE , --valueflag_cd
-        cast(null as decimal), --quantity_num
-        cast(null as varchar),
-        cast(null as datetime), --end_date
-        cast(null as varchar),
-        cast(null as decimal),
-        cast(null as varchar), --sourcesystem_cd
-        cast(null as datetime),
-        cast(null as datetime),
-        cast(null as datetime),
-        cast(null as int)
-FROM pmndiagnosis
+CROSS APPLY (VALUES ('PDX:'+Pdx), ('DX_SOURCE:'+DX_SOURCE) ) t(modifier_cd)
 UNION ALL
 -- CONDITION TABLE --
 SELECT  patid ,
@@ -124,6 +69,8 @@ SELECT  patid ,
         cast(null as int)
 FROM pmncondition
 GO
+
+/* TODO - needs to be integrated with prescribing 
 CREATE VIEW [dbo].[MULTIFACT_DISPENSING_VIEW]
 (patient_num, concept_cd, encounter_num, instance_num , provider_id, start_date, modifier_cd, observation_blob,
     valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd,
@@ -153,7 +100,8 @@ SELECT  PATID  ,
         cast(null as datetime),
         DISPENSE_AMT 
 FROM pmndispensing
-GO
+GO*/
+
 CREATE VIEW [dbo].[MULTIFACT_ENROLLMENT_VIEW]
 (patient_num, concept_cd, encounter_num, instance_num , provider_id, start_date, modifier_cd, observation_blob,
     valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd,
@@ -184,6 +132,7 @@ SELECT PATID  ,
         cast(null as int)
 FROM pmnENROLLMENT
 GO
+
 CREATE VIEW [dbo].[MULTIFACT_LABRESULTS_VIEW]
 (patient_num, concept_cd, encounter_num, instance_num , provider_id, start_date, modifier_cd, observation_blob,
     valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd,
@@ -248,6 +197,7 @@ SELECT PATID ,
         cast(null as int)
 FROM pmnprescribing
 GO
+
 CREATE VIEW [dbo].[MULTIFACT_PROCEDURE_VIEW]
 (patient_num, concept_cd, encounter_num, instance_num , provider_id, start_date, modifier_cd, observation_blob,
     valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd,
@@ -257,6 +207,7 @@ AS
 SELECT PATID ,
         CASE when (px_type = '09') then concat('ICD9:' , PX)
              when (px_type = 'C4') then concat ('CPT:' , PX)
+             when (px_type = '10') then concat ('ICD10:' , PX)
         END,
         ENCOUNTERID ,
         1,
@@ -280,6 +231,7 @@ SELECT PATID ,
         cast(null as int)
 FROM pmnprocedure
 GO
+/* TODO - broken
 CREATE VIEW [dbo].[MULTIFACT_VITAL_VIEW]
 (patient_num, concept_cd, encounter_num, instance_num , provider_id, start_date, modifier_cd, observation_blob,
     valtype_cd, tval_char, nval_num, valueflag_cd, quantity_num, units_cd, end_date, location_cd,
@@ -310,6 +262,7 @@ SELECT PATID ,
         cast(null as int)
 FROM pmnvital
 GO
+*/
 CREATE VIEW [dbo].[PATIENT_DIMENSION]
 (patient_num, vital_status_cd, birth_date, death_date , sex_cd, age_in_years_num, language_cd, race_cd,
     marital_status_cd, religion_cd, zip_cd, statecityzip_path, income_cd, patient_blob, update_date, download_date,

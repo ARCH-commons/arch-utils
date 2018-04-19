@@ -388,9 +388,9 @@ declare @sqlstr nvarchar(4000),
 
 -- IN / = operator queries on concept or provider dimension
 
-	set @sqlstr='select c_fullname, c_basecode, c_facttablecolumn, c_tablename, c_columnname, c_operator, c_dimcode into ontInOperator from ' + @tabname
-        + ' where  m_applied_path = ''@'' and lower(c_operator) in (''in'', ''='') and lower(c_tablename) in (''concept_dimension'', ''provider_dimension'') '
-    execute sp_executesql @sqlstr
+    execute sp_executesql @sqlstr	set @sqlstr='select c_fullname, c_basecode, c_facttablecolumn, c_tablename, c_columnname, c_operator, c_dimcode into ontInOperator from ' + @tabname
+        + ' where  m_applied_path = ''@'' and lower(c_operator) in (''''in'''', ''''='''') and lower(c_tablename) in (''''concept_dimension'''', ''''provider_dimension'''') '
+
 
 	alter table ontInOperator add numpats int
 
