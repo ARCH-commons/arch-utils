@@ -11,7 +11,8 @@
 -- Developed by Griffin Weber, Harvard Medical School
 -- Modified by Lori Phillips, Partners HealthCare
 -- Minor edits to support modifiers by Jeff Klann, Harvard Medical School
--- Aug 2015
+-- Additional changes to PAT_COUNT_BY_CONCEPT for multiple fact tables
+-- May 2018
 -- Bugfix in modifiers counts 12/11/15
 -- Support multiple fact tables 11/3/16- BUT NOW USES *GLOBAL TEMP TABLES* SO BE CAREFUL!
 -- Speedup to not run irrelevant count procedures - 12/19/16
@@ -145,10 +146,51 @@ select o.*, isnull(c.num_patients,0) num_patients into finalCountsByConcept
 END;
 GO
 
-CREATE PROCEDURE [dbo].[PAT_COUNT_BY_CONCEPT]  (@metadataTable varchar(50), @obsfact varchar(50) = 'observation_fact')
+-- Run PAT_COUNT_BY_CONCEPT on all multifact tables referenced in a given metadata table. Also works if only concept_cd is specified, but it will NOT work if using a single fact table but not using
+-- concept_cd for your fact column!
+-- Jeff Klann, PhD 05-2018
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'PAT_COUNT_BY_CONCEPT_ALLMULTIFACT') AND type in (N'P', N'PC'))
+DROP PROCEDURE PAT_COUNT_BY_CONCEPT_ALLMULTIFACT
+GO
+
+create procedure dbo.PAT_COUNT_BY_CONCEPT_ALLMULTIFACT(@metadataTable varchar(50)) as 
+
+DECLARE @sqlcurs NVARCHAR(4000);
+Declare @sqldyn nvarchar(4000);
+
+set @sqldyn='
+DECLARE @sqltext NVARCHAR(4000);
+declare getsql cursor static local for select distinct ''exec PAT_COUNT_BY_CONCEPT '+@metadatatable+',''+substring(replace(c_facttablecolumn,''concept_cd'',''''''''''''),1,charindex(''.'',c_facttablecolumn+''.'')-1) from '+@metadatatable+'
+
+
+begin
+OPEN getsql;
+FETCH NEXT FROM getsql INTO @sqltext;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	print @sqltext
+	exec sp_executesql @sqltext
+	FETCH NEXT FROM getsql INTO @sqltext;	
+END
+
+CLOSE getsql;
+DEALLOCATE getsql;
+end'
+begin
+exec sp_executesql @sqldyn
+end
+GO
+
+-- Count by concept
+-- Multifact support by Jeff Klann, PhD 05-18
+ALTER PROCEDURE [dbo].[PAT_COUNT_BY_CONCEPT]  (@metadataTable varchar(50), @multifact varchar(50) ='')
 
 AS BEGIN
 declare @sqlstr nvarchar(4000)
+declare @obsfact varchar(50)='observation_fact'
+declare @definedfact varchar(50)=''
+if @multifact!='' set @obsfact=@multifact
+if @multifact!='' set @definedfact=@multifact+'.'
 
     if exists (select 1 from sysobjects where name='conceptCountOnt') drop table conceptCountOnt
     if exists (select 1 from sysobjects where name='finalCountsByConcept') drop table finalCountsByConcept
@@ -159,7 +201,7 @@ declare @sqlstr nvarchar(4000)
 set @sqlstr = 'select c_fullname, c_basecode
 	into conceptCountOnt
 	from ' + @metadataTable + 
-	' where c_facttablecolumn = ''concept_cd''
+	' where c_facttablecolumn= '''+@definedfact+'concept_cd''
 		and c_tablename = ''concept_dimension''
 		and c_columnname = ''concept_path''
 		and c_synonym_cd = ''N''
@@ -208,6 +250,9 @@ SET @sqlstr = 'select distinct concept_cd, patient_num
 	from '+@obsfact+' f with (nolock)'
 EXEC sp_executesql @sqlstr
 
+ALTER TABLE ##ConceptPatient  ALTER COLUMN [PATIENT_NUM] int NOT NULL
+ALTER TABLE ##ConceptPatient  ALTER COLUMN [concept_cd] varchar(50) NOT NULL
+
 alter table ##ConceptPatient add primary key (concept_cd, patient_num)
 
 -- Create a list of distinct path-patient pairs
@@ -218,7 +263,10 @@ select distinct c.path_num, f.patient_num
 		inner join #ConceptPath c
 			on f.concept_cd = c.c_basecode
 
+
+ALTER TABLE #PathPatient  ALTER COLUMN [PATIENT_NUM] int NOT NULL
 alter table #PathPatient add primary key (path_num, patient_num)
+
 
 -- Determine the number of patients per path
 
@@ -246,10 +294,10 @@ select o.*, isnull(c.num_patients,0) num_patients into finalCountsByConcept
 
     DROP TABLE ##CONCEPTPATIENT
 
+
     END
 
 END;
-GO
 
 -- Based on similar script created by Griffin Weber, Harvard Medical School
 -- Modified by Lori Phillips, Partners HealthCare
