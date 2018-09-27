@@ -126,6 +126,7 @@ def process(numsdir = '/Users/jeffklann/Google Drive/SCILHS Phase II/Committee, 
 
     # Lowercase columnames, remove na values
     df=df[cols2].dropna(how='any',thresh=2).rename(columns=lambda x: x.lower())
+
     # Remove RAW values
     df = df[~df.c_name.str.contains("RAW_", na=False)]
     df = df.drop_duplicates()  # Bugfix, there seem to be a lot of dups
@@ -134,6 +135,10 @@ def process(numsdir = '/Users/jeffklann/Google Drive/SCILHS Phase II/Committee, 
     sum = df[df.columns[df.columns.str.contains("totalnum")]].sum(axis=1).apply(agg_val)
     sum.name = 'sum'
     df = pd.concat([df, sum], axis=1)
+
+    # Make sure the axis is labeled!
+    df = df.rename_axis('c_fullname')
+
     return df
 
 def agg_val(tot):
@@ -199,6 +204,6 @@ def read_csv_multiformat(fname):
 """
 
 if __name__ == "__main__":
-    #convertXLS()
-    #process2CSV()
+    convertXLS()
+    process2CSV()
     buildSum()
