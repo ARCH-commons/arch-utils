@@ -39,7 +39,7 @@ def buildDb():
             bigfullname = t.df.join(bigfullname,how='outer',rsuffix='_'+totals_f[x][-4:])
             bigfullname=bigfullname[[x for x in filter(lambda x:'c_name' in x, bigfullname.columns.tolist())]]
             bigfullname = bigfullname.apply(lambda x: x[0] if isinstance(x[0],str) else x[1], axis=1).rename('c_name') # Why is this so slow?
-        print(len(bigfullname))
+        print("Ontology size after processing:" + str(len(bigfullname)))
     bigfullname=bigfullname.to_frame('c_name').rename_axis('c_fullname')
 
     # Add c_hlevel, domain, and fullname_int columns
@@ -52,8 +52,8 @@ def buildDb():
     # Gather the individual totals
     delish = None
     for x, v in enumerate(totals_f):
-        refresh_date = v[:-2]+v[2:] # Reverse the indices so numerically 02-2017 is before 01-2018
-        print(refresh_date)
+        refresh_date = '20'+v[2:]+'-'+v[:-2]+'-01' # Convert date mmyy to YYYY-mm-dd (where dd is 01)
+        print("Processing refresh date:" + str(refresh_date))
 
         # Add refresh date gleaned on load
         if 'refresh_date' not in totals[x].dfm.columns:
@@ -75,10 +75,13 @@ def buildDb():
     outdf.to_sql("totalnums",conn,if_exists='replace')
 
     # Add indexes
+    print("Indexing...")
     cur = conn.cursor()
     cur.execute("CREATE INDEX bfn_0 on bigfullname(c_hlevel)")
     cur.execute("CREATE INDEX bfn_int on bigfullname(fullname_int)")
     cur.execute("CREATE INDEX tot_int on totalnums(fullname_int)")
+
+    print("Done!")
 
 if __name__=='__main__':
     buildDb()
