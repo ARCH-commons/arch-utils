@@ -2,6 +2,7 @@ import json
 import sqlite3
 
 import dash
+import dash_auth
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
@@ -10,7 +11,7 @@ from dash.dependencies import Input, Output, State
 
 # Experimental visualization of totalnum data using the output of totalnum_builddb. Uses dash.
 # Now supports deployment, multiple sessions, and gunicorn!
-# To run with gunicorn: gunicorn 'totalnum_dashboard_new.py:initApp("/path/to/database")'
+# To run with gunicorn: GUNICORN_CMD_ARGS="--bind=0.0.0.0" gunicorn 'totalnum_dashboard_new.py:initApp("/path/to/database")'
 # by Jeff Klann, PHD 9-2018
 
 
@@ -20,6 +21,14 @@ instruction = """# How to use
 3. To display graphs, check boxes as desired. Temporal totalnum graphs will appear below.
 """
 app = dash.Dash()
+
+# App Auth
+# Set username and password in local install, instead of hello world
+auth = dash_auth.BasicAuth(
+    app,
+    [['hello','world']]
+)
+
 
 # App Layout
 app.layout = html.Div([
@@ -163,7 +172,7 @@ def cbGraph(checks, isite,state):
         if len(xf) > 0:
             traces.append(
                 go.Scatter(x=xf['refresh_date'], y=xf['c'], text=xf.iloc[0, :].c_name, name=xf.iloc[0, :].c_name,
-                           marker={'size': 15}, mode='line'))
+                           marker={'size': 15}, mode='lines'))
     return {'data': traces}
 
 if __name__=='__main__':
