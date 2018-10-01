@@ -1,5 +1,6 @@
 import datetime as dt
 from os import listdir
+from zipfile import ZipFile
 
 import pandas as pd
 
@@ -7,11 +8,12 @@ import totalnum_aggregator.totalnum_tools as totpkg
 
 # Python version of totalnum mixer / pre-processor
 # Requires pandas and Numpy. Python 3 syntax.
-# By Jeff Klann, PhD 6/2017-9/2018
+# By Jeff Klann, PhD 6/2017-10/2018
 """ 
 Instructions for use: 
   1) Create a directory of totalnum files, one per location, for a single point in time.
       Files must be in this csv format: c_fullname, c_name, totalnum_[sitename]
+      NEW 10-01-18! Files can be zipped, except for totalnum_allpaths and any Excel files that need to be converted.
   2) From a reference database, generate the master ontology file:
     Using csvkit:
      a) Follow the installation instructions here: https://github.com/ARCH-commons/arch-utils/wiki/Uploading-your-totalnum-counts-to-SCILHS-(for-SCILHS-sites)
@@ -84,26 +86,41 @@ def convertXLS(numsdir = '/Users/jeffklann/Google Drive/SCILHS Phase II/Committe
 def process(numsdir = '/Users/jeffklann/Google Drive/SCILHS Phase II/Committee, Cores, Panels/Informatics & Technology Core/totalnums/',
             numsextdir = 'nums_0818'):
     global totalnums,allpaths,df
-    files = [f for f in listdir(numsdir+numsextdir) if ".csv" in f[-4:]]
-    print(files)
     allpaths = read_csv_multiformat(numsdir+numsextdir+'/totalnums_allpaths.csv')
     totalnums = []
+
+    # Take a loaded totalnum df, do a little cleanup, return it
+    # f is the filename in case site abbreviation needs cleanup
+    def process_file(df,f):
+        # Convert non-numeric values in totalnum column to 5
+        # (One of our sites labels counts that are less than ten with a string)
+        if df.dtypes[-1] == 'O':  # Column has strings
+            print("Converting strings to 5 for " + f)
+            df.loc[df.iloc[:, -1].str.isnumeric() == False, df.columns[-1]] = 5
+        # If the totalnum column is called c_totalnum, rather than something site-specific, rename it:
+        if 'c_totalnum' in df.columns[-1] and len(df.columns[-1]) <= len('c_totalnum') + 1:
+            siteabbr = min(f.split('_'), key=len)
+            print(f + 'is not labeled right, I could change it to: totalnum_' + siteabbr)
+            df = df.rename(columns={'c_totalnum': 'totalnum_' + siteabbr})
+        return df
+
+    # Load .csv files
+    files = [f for f in listdir(numsdir+numsextdir) if ".csv" in f[-4:]]
     for f in files:
         if 'allpaths.csv' not in f: # skip allpaths
             print(f)
             # Load the csv
-            df = read_csv_multiformat(numsdir+numsextdir+"/"+f)
-            # Convert non-numeric values in totalnum column to 5
-            # (One of our sites labels counts that are less than ten with a string)
-            if df.dtypes[-1]=='O': # Column has strings
-                print("Converting strings to 5 for " + f)
-                df.loc[df.iloc[:, -1].str.isnumeric() == False, df.columns[-1]] = 5
-            # If the totalnum column is called c_totalnum, rather than something site-specific, rename it:
-            if 'c_totalnum' in df.columns[-1] and len(df.columns[-1])<=len('c_totalnum')+1:
-                siteabbr = min(f.split('_'), key=len)
-                print(f+'is not labeled right, I could change it to: totalnum_'+siteabbr)
-                df=df.rename(columns={'c_totalnum':'totalnum_'+siteabbr})
-            totalnums.append(df)
+            totalnums.append(process_file(read_csv_multiformat(numsdir+numsextdir+"/"+f),f))
+
+    # Load .zip files
+    files = [f for f in listdir(numsdir+numsextdir) if '.zip' in f[-4:]]
+    for f in files:
+        z = ZipFile(numsdir+numsextdir+"/"+f)
+        zf = [zi.filename for zi in z.infolist() if ".csv" in zi.filename[-4:] and zi.filename[0] not in ('.','_')] # Include only non-hidden csvs
+        for zn in zf:
+            print(f+":"+zn)
+            totalnums.append(process_file(read_csv_multiformat(z.open(zn)),zn))
+
     i = 0
     df = allpaths
     for t in totalnums:
