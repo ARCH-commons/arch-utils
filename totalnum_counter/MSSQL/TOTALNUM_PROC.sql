@@ -13,6 +13,7 @@
 -- Minor edits to support modifiers by Jeff Klann, Harvard Medical School
 -- Additional changes to PAT_COUNT_BY_CONCEPT for multiple fact tables
 -- May 2018
+-- Bugfix: pat_count_in_equal got messed up somehow, reverted
 -- Bugfix in modifiers counts 12/11/15
 -- Support multiple fact tables 11/3/16- BUT NOW USES *GLOBAL TEMP TABLES* SO BE CAREFUL!
 -- Speedup to not run irrelevant count procedures - 12/19/16
@@ -183,7 +184,7 @@ GO
 
 -- Count by concept
 -- Multifact support by Jeff Klann, PhD 05-18
-ALTER PROCEDURE [dbo].[PAT_COUNT_BY_CONCEPT]  (@metadataTable varchar(50), @multifact varchar(50) ='')
+CREATE PROCEDURE [dbo].[PAT_COUNT_BY_CONCEPT]  (@metadataTable varchar(50), @multifact varchar(50) ='')
 
 AS BEGIN
 declare @sqlstr nvarchar(4000)
@@ -298,6 +299,7 @@ select o.*, isnull(c.num_patients,0) num_patients into finalCountsByConcept
     END
 
 END;
+GO
 
 -- Based on similar script created by Griffin Weber, Harvard Medical School
 -- Modified by Lori Phillips, Partners HealthCare
@@ -436,11 +438,12 @@ declare @sqlstr nvarchar(4000),
 
 -- IN / = operator queries on concept or provider dimension
 
-    execute sp_executesql @sqlstr	set @sqlstr='select c_fullname, c_basecode, c_facttablecolumn, c_tablename, c_columnname, c_operator, c_dimcode into ontInOperator from ' + @tabname
-        + ' where  m_applied_path = ''@'' and lower(c_operator) in (''''in'''', ''''='''') and lower(c_tablename) in (''''concept_dimension'''', ''''provider_dimension'''') '
-
+    set @sqlstr='select c_fullname, c_basecode, c_facttablecolumn, c_tablename, c_columnname, c_operator, c_dimcode into ontInOperator from ' + @tabname
+        + ' where  m_applied_path = ''@'' and lower(c_operator) in (''in'', ''='') and lower(c_tablename) in (''concept_dimension'', ''provider_dimension'') '
+    execute sp_executesql @sqlstr
 
 	alter table ontInOperator add numpats int
+	
 
   if exists(select top 1 NULL from ontInOperator)
   BEGIN
@@ -574,9 +577,9 @@ GO
 -- Created by Lori Phillips, Partners HealthCare
 -- Modified by Jeff Klann, PhD
 -- August 2015
+-- Bugfix jklann 6/18 - I had changed this to pass fact table names for multifact counting. This is not the way to invoke multifact counting. Run the new multifact proc instead.
 
-
-CREATE PROCEDURE [dbo].[RUN_ALL_COUNTS] (@tablename varchar(50), @obsfact varchar(50) = 'observation_fact')
+CREATE PROCEDURE [dbo].[RUN_ALL_COUNTS] (@tablename varchar(50))
 AS BEGIN
 
     declare @sqlstr nvarchar(4000)
@@ -586,11 +589,11 @@ AS BEGIN
 	execute sp_executesql @sqlstr
 
 
-exec dbo.PAT_VISIT_COUNTS @tablename, @obsfact
-exec dbo.PAT_COUNT_BY_CONCEPT @tablename, @obsfact
-exec dbo.PAT_COUNT_BY_PROVIDER @tablename, @obsfact
-exec dbo.PAT_COUNT_IN_EQUAL @tablename, @obsfact
-exec dbo.PAT_COUNT_MODIFIERS @tablename, @obsfact
+exec dbo.PAT_VISIT_COUNTS @tablename
+exec dbo.PAT_COUNT_BY_CONCEPT @tablename
+exec dbo.PAT_COUNT_BY_PROVIDER @tablename
+exec dbo.PAT_COUNT_IN_EQUAL @tablename
+exec dbo.PAT_COUNT_MODIFIERS @tablename
 
 	set @sqlstr='update ' + @tablename + ' set c_totalnum=null where c_visualattributes = ''CA'' and c_totalnum = 0'
 --	print @sqlstr
