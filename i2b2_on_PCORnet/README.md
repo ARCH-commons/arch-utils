@@ -13,3 +13,4 @@ This technology is described [in this manuscript](https://academic.oup.com/jamia
 3. Create your pcornet dataset in the CRC schema.
 4. Run the create-star-schema script from the CRC schema.
 5. Run the metadata-update script from the metadata schema.
+6. Make sure your PCORnet tables are indexed. Model them after the [default indexes for the observation_fact table](https://github.com/i2b2/i2b2-data/blob/master/edu.harvard.i2b2.data/Release_1-7/NewInstall/Crcdata/scripts/crc_create_datamart_sqlserver.sql)
