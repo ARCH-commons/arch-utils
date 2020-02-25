@@ -41,22 +41,25 @@ def process2CSV(numsdir = '/Users/jeffklann/Google Drive/SCILHS Phase II/Committ
 
 # After totalnums are built, find the most recent count for each site in the joined files, sum these, round down, and save
 def buildSum(numsdir = '/Users/jeffklann/Google Drive/SCILHS Phase II/Committee, Cores, Panels/Informatics & Technology Core/totalnums/',
-             joinedextdir = 'joined',outDirAndName='sum.csv'):
+             joinedextdir = 'joined',outDirAndName='sum.csv',outDirAndNameAvg='avg.csv'):
     files = [f for f in listdir(numsdir+joinedextdir) if ".csv" in f[-4:] and 'joined' in f]
     files = sorted(files, key=lambda x: dt.datetime.strptime(x[7:11], '%m%y'))
     cols_all = []
     df_all = None
+    dfp_all = None
     for f in files[::-1]:
         print(f)
         tot = totpkg.Totalnum()
-        tot.init(numsdir+joinedextdir+'/',f,minimal=True)
+        tot.init(numsdir+joinedextdir+'/',f,minimal=False)
         cols_new = [x for x in filter(lambda x: x!='na',[x if x not in cols_all else 'na' for x in tot.df.columns ])]
         cols_all=cols_all+cols_new
         print(cols_new)
         if df_all is None:
             df_all=tot.df[cols_new]
+            dfp_all=tot.dfp[cols_new]
         elif len(cols_new)>0:
-            df_all=df_all.join(tot.df[cols_new],how='left')
+            df_all=df_all.join(tot.dfp[cols_new],how='left')
+            dfp_all = dfp_all.join(tot.dfp[cols_new], how='left')
 
     # Compute sum column,save, and return
     sum = df_all[df_all.columns[df_all.columns.str.contains("#")]].sum(axis=1)
@@ -64,6 +67,17 @@ def buildSum(numsdir = '/Users/jeffklann/Google Drive/SCILHS Phase II/Committee,
     sum = sum.apply(agg_val)
     sum.name = 'sum'
     sum.to_csv(numsdir+outDirAndName)
+
+    # NEW 5/19 - Now compute avg and std dev too
+    avg = dfp_all[dfp_all.columns[dfp_all.columns.str.contains("#")]].mean(axis=1)
+    avg = pd.to_numeric(avg,downcast='integer')
+    avg.name = 'avg'
+    stdev = dfp_all[dfp_all.columns[dfp_all.columns.str.contains("#")]].std(axis=1)
+    stdev = pd.to_numeric(stdev, downcast='float')
+    stdev.name = 'stdev'
+    outavg = pd.concat([df_all,avg,stdev],axis=1)
+    outavg.to_csv(numsdir+outDirAndNameAvg)
+
     return sum
 
 # One of our sites always submits as a multisheet excel file with extra columns, this converts to csv
@@ -221,6 +235,6 @@ def read_csv_multiformat(fname):
 """
 
 if __name__ == "__main__":
-    convertXLS()
-    process2CSV()
+#    convertXLS()
+#    process2CSV()
     buildSum()

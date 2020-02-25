@@ -34,6 +34,7 @@ class Totalnum:
                            id_vars=['c_name', 'domain', 'c_hlevel'], var_name='site', value_name='c')
         dfm_temp = dfm_temp.where(dfm_temp.c_hlevel > 4)[['site', 'c']].groupby('site').sum().T
         self.dfm_tot = dfm_temp
+        print(df.columns)
         dfp = pd.concat([df.ix[:, 0:3], df.ix[:, 3:].divide(dfm_temp.loc[dfm_temp.index[0]], axis='columns') * 100],
                         axis='columns')
 
@@ -68,9 +69,10 @@ class Totalnum:
         # Rename totalnum columns - remove totalnum_ or totalnum_c1 and uppercase
         df = df.rename(columns=lambda x: '#'+x[x.find('_') + 1:].upper()[2 if 'c1' in x else 0:] if 'totalnum' in x else x)
         # Add sum column
-        sum = df[df.columns[df.columns.str.contains("#")]].sum(axis=1)
-        sum.name = 'sum'
-        df=pd.concat([df, sum], axis=1)
+        if (not df.columns.str.contains('sum').any()) : # Bugfix, don't compute sum twice
+            sum = df[df.columns[df.columns.str.contains("#")]].sum(axis=1)
+            sum.name = 'sum'
+            df=pd.concat([df, sum], axis=1)
 
         return df
 
